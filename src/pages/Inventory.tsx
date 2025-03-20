@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -34,7 +33,6 @@ export default function Inventory() {
   const location = useLocation();
   const { toast } = useToast();
   
-  // Extract series from URL query param
   const queryParams = new URLSearchParams(location.search);
   const seriesParam = queryParams.get("series");
 
@@ -42,18 +40,15 @@ export default function Inventory() {
     const loadData = async () => {
       setIsLoading(true);
       
-      // Load cart from localStorage
       const savedCart = loadCartFromLocalStorage();
       setCart(savedCart);
       
-      // Fetch expansions and inventory
       const expansionsData = await fetchExpansions();
       setExpansions(expansionsData);
       
       const inventoryData = await fetchInventory();
       setInventory(inventoryData);
       
-      // Apply initial filter if series param exists
       if (seriesParam) {
         setActiveFilters({
           ...activeFilters,
@@ -68,17 +63,13 @@ export default function Inventory() {
   }, []);
 
   useEffect(() => {
-    // Filter inventory based on active filters and search query
     let filtered = [...inventory];
     
-    // Apply series filter
     if (activeFilters.expansion) {
       filtered = filtered.filter(card => card.expansion_id === activeFilters.expansion);
     }
     
-    // Apply card type filter
     if (activeFilters.cardType) {
-      // This is simplified - in a real app, you'd need proper card type data
       filtered = filtered.filter(card => {
         if (activeFilters.cardType === "Pokémon") {
           return !card.name_en.includes("Energy") && !card.name_en.includes("Trainer");
@@ -91,23 +82,19 @@ export default function Inventory() {
       });
     }
     
-    // Apply rarity filter
     if (activeFilters.rarity) {
       filtered = filtered.filter(card => card.rarity === activeFilters.rarity);
     }
     
-    // Apply condition filter
     if (activeFilters.condition) {
       filtered = filtered.filter(card => card.condition === activeFilters.condition);
     }
     
-    // Apply price range filter
     filtered = filtered.filter(card => 
       card.price >= activeFilters.priceRange[0] && 
       card.price <= activeFilters.priceRange[1]
     );
     
-    // Apply search query
     if (searchQuery) {
       filtered = filtered.filter(card => 
         card.name_en.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -259,7 +246,6 @@ export default function Inventory() {
         </div>
         
         <div className="flex flex-col sm:flex-row">
-          {/* Filters sidebar (desktop) */}
           <div className={cn(
             "w-full sm:w-64 px-4 sm:px-0 sm:pl-6 flex-shrink-0 transition-all duration-300 overflow-hidden",
             showFilters ? "block" : "hidden sm:block"
@@ -269,7 +255,6 @@ export default function Inventory() {
             </div>
           </div>
           
-          {/* Main content */}
           <div className="flex-grow px-4 sm:px-6">
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
@@ -299,7 +284,9 @@ export default function Inventory() {
                         image_url={card.image_url}
                         condition={card.condition}
                         expansion={card.expansion}
+                        expansion_id={card.expansion_id}
                         rarity={card.rarity}
+                        blueprint_id={card.blueprint_id}
                         addToCart={handleAddToCart}
                       />
                     ))}

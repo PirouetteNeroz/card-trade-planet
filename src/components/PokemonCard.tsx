@@ -19,6 +19,7 @@ export default function PokemonCard({
   image_url,
   condition,
   expansion,
+  expansion_id,
   rarity,
   blueprint_id,
   addToCart
@@ -43,7 +44,7 @@ export default function PokemonCard({
       image_url,
       condition,
       expansion,
-      expansion_id: expansion,
+      expansion_id,
       rarity,
       blueprint_id
     });
