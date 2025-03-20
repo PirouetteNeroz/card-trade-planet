@@ -2,16 +2,19 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { safeDisplayValue } from "@/lib/debugUtils";
 
 interface SeriesCardProps {
-  id: string;
-  name: string;
-  logo: string;
-  releaseDate?: string;
-  cardCount?: number;
+  serie: {
+    id: string;
+    name: string;
+    logo: string;
+    releaseDate?: string;
+    cardCount?: any;
+  };
 }
 
-export default function SeriesCard({ id, name, logo, releaseDate, cardCount }: SeriesCardProps) {
+export default function SeriesCard({ serie }: SeriesCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
@@ -25,8 +28,21 @@ export default function SeriesCard({ id, name, logo, releaseDate, cardCount }: S
   };
 
   const handleClick = () => {
-    navigate(`/inventory?series=${id}`);
+    navigate(`/inventory?series=${serie.id}`);
   };
+
+  // Process cardCount which might be an object
+  let cardCountDisplay: string | number | undefined = undefined;
+  
+  if (serie.cardCount) {
+    if (typeof serie.cardCount === 'object') {
+      const total = serie.cardCount.total || 0;
+      const official = serie.cardCount.official || 0;
+      cardCountDisplay = `${official} cartes`;
+    } else {
+      cardCountDisplay = serie.cardCount;
+    }
+  }
 
   return (
     <div 
@@ -40,12 +56,12 @@ export default function SeriesCard({ id, name, logo, releaseDate, cardCount }: S
         
         {imageError ? (
           <div className="absolute inset-0 flex items-center justify-center bg-slate-200 dark:bg-slate-700">
-            <span className="text-slate-500 dark:text-slate-400">{name}</span>
+            <span className="text-slate-500 dark:text-slate-400">{serie.name}</span>
           </div>
         ) : (
           <img
-            src={`${logo}.png`}
-            alt={name}
+            src={`${serie.logo}.png`}
+            alt={serie.name}
             className={cn(
               "w-full h-full object-contain transition-all duration-500",
               imageLoaded ? "opacity-100" : "opacity-0"
@@ -59,10 +75,10 @@ export default function SeriesCard({ id, name, logo, releaseDate, cardCount }: S
       </div>
       
       <div className="p-4">
-        <h3 className="font-medium text-lg mb-1 line-clamp-1">{name}</h3>
+        <h3 className="font-medium text-lg mb-1 line-clamp-1">{serie.name}</h3>
         <div className="flex justify-between text-sm text-slate-500 dark:text-slate-400">
-          {releaseDate && <span>{new Date(releaseDate).getFullYear()}</span>}
-          {cardCount && <span>{cardCount} cartes</span>}
+          {serie.releaseDate && <span>{new Date(serie.releaseDate).getFullYear()}</span>}
+          {cardCountDisplay && <span>{cardCountDisplay}</span>}
         </div>
       </div>
       

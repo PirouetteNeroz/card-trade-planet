@@ -1,6 +1,8 @@
+
 import { useState, useEffect } from "react";
 import SeriesCard from "@/components/SeriesCard";
 import { logObject } from "@/lib/debugUtils";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 // Add this debug component to analyze data
 const DebugData = ({ data }: { data: any }) => {
@@ -46,7 +48,7 @@ const Index = () => {
     } catch (error) {
       console.error('Erreur:', error);
     } finally {
-      setIsLoading(false); // Fixed: Changed from setIsLoading.value = false to setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -61,7 +63,9 @@ const Index = () => {
               <p>Chargement des séries...</p>
             ) : (
               series.map((serie) => (
-                <SeriesCard key={serie.id} serie={serie} />
+                <ErrorBoundary key={serie.id}>
+                  <SeriesCard serie={serie} />
+                </ErrorBoundary>
               ))
             )}
           </div>

@@ -43,7 +43,17 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
   const conditions = ["", "Mint", "Near Mint", "Excellent", "Good", "Played", "Poor"];
 
   const handleFilterChange = (key: keyof FilterState, value: any) => {
-    const newFilters = { ...filters, [key]: value };
+    // Make sure priceRange is always a tuple of [number, number]
+    let updatedValue = value;
+    if (key === 'priceRange' && Array.isArray(value)) {
+      // Ensure it's a tuple with exactly 2 elements
+      updatedValue = [
+        value[0] !== undefined ? value[0] : filters.priceRange[0],
+        value[1] !== undefined ? value[1] : filters.priceRange[1]
+      ] as [number, number];
+    }
+    
+    const newFilters = { ...filters, [key]: updatedValue };
     setFilters(newFilters);
     onFilterChange(newFilters);
     
@@ -58,7 +68,7 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
   };
 
   const resetFilters = () => {
-    const resetState = {
+    const resetState: FilterState = {
       cardType: "",
       rarity: "",
       condition: "",
