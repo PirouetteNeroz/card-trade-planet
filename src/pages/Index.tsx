@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import SeriesCard from "@/components/SeriesCard";
 import { logObject } from "@/lib/debugUtils";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import Navbar from "@/components/Navbar";
 
 // Add this debug component to analyze data
 const DebugData = ({ data }: { data: any }) => {
@@ -54,6 +55,7 @@ const Index = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Navbar />
       <DebugData data={series} />
       <main>
         <section className="mb-10">

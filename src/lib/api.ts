@@ -3,6 +3,7 @@
 const API_PRODUCTS = 'https://api.cardtrader.com/api/v2/products/export';
 const API_EXPANSIONS = 'https://api.cardtrader.com/api/v2/expansions/export';
 const API_TOKEN = 'eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJjYXJkdHJhZGVyLXByb2R1Y3Rpb24iLCJzdWIiOiJhcHA6MTM5MzgiLCJhdWQiOiJhcHA6MTM5MzgiLCJleHAiOjQ4OTU2MzQ3MTcsImp0aSI6IjQxMjA3NmNjLTcyZTEtNDljOC1iODA2LTE3OTJiNmU3N2JhMyIsImlhdCI6MTczOTk2MTExNywibmFtZSI6Ik5lcm96YnJpY2tzIEFwcCAyMDI1MDIwODE3NDkxOSJ9.PkkEXit3MvxmVij_e5Eyz55k_3EYgQF-2ln9goSfMbQD3mIpDVrSkQa010BfnF9IR1L8fvswAyxk56qiUr2LKm2KXX0iKAvVRR373A3XEDwgNtGGBBAR-rxh8raL1hW8e4AH_bps1tVFTrdZ_W-Odg5egSxLFIxnLgi0a9It5KVeVkjdgLmxYuaCXspgml9TXfgJcJ2GH62izvB5eUsAj4NhobpH5q_Pyfbyw2cJu4HmilQjBSOm4NsmRW7Nd692tNT2semj1Oh1UqV1xel2WewtLaWlUAVHYt2LSMWrEw_kx9Yjk9Kz-rM67tk0nXosKklnIigJpcrmRUXf-O7qJA';
+const IMAGE_BASE_URL = 'https://www.cardtrader.com/images/blueprint/';
 
 // Type definitions
 export interface Series {
@@ -24,6 +25,7 @@ export interface Card {
   expansion_id: string;
   rarity?: string;
   properties_hash?: any;
+  blueprint_id?: number;
 }
 
 export interface CartItem extends Card {
@@ -92,12 +94,14 @@ export async function fetchInventory(): Promise<Card[]> {
         id: card.id,
         name_en: card.name_en,
         name_fr: frenchName,
-        price: card.price,
-        image_url: card.image_url,
+        price: card.price_cents / 100, // Convert cents to euros
+        image_url: card.blueprint_id ? `${IMAGE_BASE_URL}${card.blueprint_id}.jpg` : undefined,
         condition: card.properties_hash?.condition || 'Non spécifiée',
-        expansion: card.expansion,
-        expansion_id: card.expansion_id,
-        rarity: card.properties_hash?.rarity
+        expansion: card.expansion.id,
+        expansion_id: card.expansion.id,
+        rarity: card.properties_hash?.pokemon_rarity,
+        properties_hash: card.properties_hash,
+        blueprint_id: card.blueprint_id
       };
     }));
   } catch (error) {
