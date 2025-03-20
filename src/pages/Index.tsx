@@ -1,128 +1,74 @@
-
 import { useState, useEffect } from "react";
-import Navbar from "@/components/Navbar";
 import SeriesCard from "@/components/SeriesCard";
-import { Series, fetchAllSeries } from "@/lib/api";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Loader2 } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { logObject } from "@/lib/debugUtils";
 
-export default function Index() {
-  const [series, setSeries] = useState<Series[]>([]);
-  const [filteredSeries, setFilteredSeries] = useState<Series[]>([]);
+// Add this debug component to analyze data
+const DebugData = ({ data }: { data: any }) => {
+  useEffect(() => {
+    logObject("Series data", data);
+  }, [data]);
+  
+  return null;
+};
+
+const Index = () => {
+  const [series, setSeries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
-    const loadSeries = async () => {
-      setIsLoading(true);
-      const data = await fetchAllSeries();
-      setSeries(data);
-      setFilteredSeries(data);
-      setIsLoading(false);
-    };
-
-    loadSeries();
+    fetchAllSeries();
   }, []);
 
-  useEffect(() => {
-    // Filter series based on search query and active tab
-    let filtered = series;
-
-    if (searchQuery) {
-      filtered = filtered.filter((series) =>
-        series.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+  async function fetchAllSeries() {
+    try {
+      const response = await fetch('https://api.tcgdex.net/v2/fr/sets');
+      if (!response.ok) throw new Error('Impossible de récupérer les séries');
+      const data = await response.json();
+      
+      // Log the data to see its structure
+      console.log("API Response:", data);
+      
+      // Make sure we transform any complex objects into renderable format
+      const processedData = data.map((item: any) => {
+        // Check if item contains complex objects that can't be directly rendered
+        const processedItem = { ...item };
+        
+        // Handle known problematic fields (like objects with total/official)
+        if (processedItem.cardCount && typeof processedItem.cardCount === 'object') {
+          processedItem.cardCountDisplay = `${processedItem.cardCount.official || 0} (Total: ${processedItem.cardCount.total || 0})`;
+          // Keep the original data for other uses
+        }
+        
+        return processedItem;
+      });
+      
+      setSeries(processedData);
+    } catch (error) {
+      console.error('Erreur:', error);
+    } finally {
+      setIsLoading(false); // Fixed: Changed from setIsLoading.value = false to setIsLoading(false)
     }
-
-    if (activeTab === "recent") {
-      filtered = filtered
-        .filter((series) => series.releaseDate)
-        .sort((a, b) => {
-          const dateA = a.releaseDate ? new Date(a.releaseDate).getTime() : 0;
-          const dateB = b.releaseDate ? new Date(b.releaseDate).getTime() : 0;
-          return dateB - dateA;
-        })
-        .slice(0, 12);
-    } else if (activeTab === "popular") {
-      // For demonstration, we'll just show some randomly selected series as "popular"
-      filtered = [...filtered].sort(() => 0.5 - Math.random()).slice(0, 12);
-    }
-
-    setFilteredSeries(filtered);
-  }, [searchQuery, activeTab, series]);
+  }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 page-transition">
-      <Navbar />
-      
-      <main className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <section className="mb-16">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-pokemon-blue via-pokemon-red to-pokemon-yellow animate-pulse">
-              Card Planet
-            </h1>
-            <p className="text-xl text-slate-600 dark:text-slate-300 mb-8">
-              Découvrez notre collection de cartes Pokémon exceptionnelles
-            </p>
-            
-            <div className="relative max-w-md mx-auto mb-12">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-slate-400" />
-              <Input
-                type="text"
-                placeholder="Rechercher une série..."
-                className="pl-10 py-6 rounded-full shadow-md border-0"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      <DebugData data={series} />
+      <main>
+        <section className="mb-10">
+          <h1 className="text-3xl font-bold mb-6">Séries de cartes Pokémon</h1>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {isLoading ? (
+              <p>Chargement des séries...</p>
+            ) : (
+              series.map((serie) => (
+                <SeriesCard key={serie.id} serie={serie} />
+              ))
+            )}
           </div>
         </section>
-
-        <section>
-          <Tabs defaultValue="all" className="mb-8" onValueChange={setActiveTab}>
-            <div className="flex justify-center">
-              <TabsList className="grid grid-cols-3 w-full max-w-md">
-                <TabsTrigger value="all">Toutes les séries</TabsTrigger>
-                <TabsTrigger value="recent">Récentes</TabsTrigger>
-                <TabsTrigger value="popular">Populaires</TabsTrigger>
-              </TabsList>
-            </div>
-          </Tabs>
-
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : filteredSeries.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-slate-500 dark:text-slate-400">Aucune série trouvée</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 animate-fade-in">
-              {filteredSeries.map((serie) => (
-                <SeriesCard
-                  key={serie.id}
-                  id={serie.id}
-                  name={serie.name}
-                  logo={serie.logo}
-                  releaseDate={serie.releaseDate}
-                  cardCount={serie.cardCount}
-                />
-              ))}
-            </div>
-          )}
-        </section>
       </main>
-      
-      <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-slate-500 dark:text-slate-400">
-            &copy; {new Date().getFullYear()} Card Planet. Tous droits réservés.
-          </p>
-        </div>
-      </footer>
     </div>
   );
-}
+};
+
+export default Index;
