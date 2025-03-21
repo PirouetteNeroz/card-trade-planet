@@ -26,6 +26,10 @@ export interface Card {
   rarity?: string;
   properties_hash?: any;
   blueprint_id?: number;
+  quantity: number;
+  collectorNumber?: string;
+  language: string;
+  isReverse: boolean;
 }
 
 export interface CartItem extends Card {
@@ -97,11 +101,15 @@ export async function fetchInventory(): Promise<Card[]> {
         price: card.price_cents / 100, // Convert cents to euros
         image_url: card.blueprint_id ? `${IMAGE_BASE_URL}${card.blueprint_id}.jpg` : undefined,
         condition: card.properties_hash?.condition || 'Non spécifiée',
-        expansion: card.expansion.id,
+        expansion: card.expansion.name || card.expansion.id,
         expansion_id: card.expansion.id,
         rarity: card.properties_hash?.pokemon_rarity,
         properties_hash: card.properties_hash,
-        blueprint_id: card.blueprint_id
+        blueprint_id: card.blueprint_id,
+        quantity: card.quantity || 1,
+        collectorNumber: card.properties_hash?.collector_number,
+        language: card.properties_hash?.pokemon_language || 'en',
+        isReverse: card.properties_hash?.pokemon_reverse || false
       };
     }));
   } catch (error) {

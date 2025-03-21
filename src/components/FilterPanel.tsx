@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Filter, ChevronDown, X } from "lucide-react";
+import { Filter, ChevronDown, X, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface FilterPanelProps {
   onFilterChange: (filters: FilterState) => void;
@@ -24,6 +25,8 @@ export interface FilterState {
   condition: string;
   expansion: string;
   priceRange: [number, number];
+  language: string;
+  isReverse: boolean;
 }
 
 export default function FilterPanel({ onFilterChange, expansions }: FilterPanelProps) {
@@ -34,6 +37,8 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
     condition: "",
     expansion: "",
     priceRange: [0, 1000],
+    language: "",
+    isReverse: false
   });
   
   const [activeFiltersCount, setActiveFiltersCount] = useState(0);
@@ -41,6 +46,21 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
   const cardTypes = ["", "Pokémon", "Dresseur", "Énergie"];
   const rarities = ["", "Common", "Uncommon", "Rare", "Holo Rare", "Ultra Rare", "Secret Rare"];
   const conditions = ["", "Mint", "Near Mint", "Excellent", "Good", "Played", "Poor"];
+  const languages = ["", "en", "fr", "de", "es", "it", "pt", "jp", "ko", "cn", "ru"];
+  
+  const languageLabels: Record<string, string> = {
+    "": "Toutes",
+    "en": "Anglais",
+    "fr": "Français",
+    "de": "Allemand",
+    "es": "Espagnol",
+    "it": "Italien",
+    "pt": "Portugais",
+    "jp": "Japonais",
+    "ko": "Coréen",
+    "cn": "Chinois",
+    "ru": "Russe"
+  };
 
   const handleFilterChange = (key: keyof FilterState, value: any) => {
     // Make sure priceRange is always a tuple of [number, number]
@@ -63,6 +83,8 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
     if (newFilters.rarity) count++;
     if (newFilters.condition) count++;
     if (newFilters.expansion) count++;
+    if (newFilters.language) count++;
+    if (newFilters.isReverse) count++;
     if (newFilters.priceRange[0] > 0 || newFilters.priceRange[1] < 1000) count++;
     setActiveFiltersCount(count);
   };
@@ -74,6 +96,8 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
       condition: "",
       expansion: "",
       priceRange: [0, 1000],
+      language: "",
+      isReverse: false
     };
     setFilters(resetState);
     onFilterChange(resetState);
@@ -172,6 +196,38 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
                 </Badge>
               ))}
             </div>
+          </div>
+
+          {/* Language Filter */}
+          <div>
+            <label className="text-sm font-medium mb-1 block">Langue</label>
+            <div className="flex flex-wrap gap-2">
+              {languages.map((lang) => (
+                <Badge
+                  key={lang}
+                  variant={filters.language === lang ? "default" : "outline"}
+                  className="cursor-pointer"
+                  onClick={() => handleFilterChange("language", lang)}
+                >
+                  {languageLabels[lang]}
+                </Badge>
+              ))}
+            </div>
+          </div>
+
+          {/* Reverse Filter */}
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="reverse"
+              checked={filters.isReverse}
+              onCheckedChange={(checked) => handleFilterChange("isReverse", !!checked)}
+            />
+            <label
+              htmlFor="reverse"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Cartes Reverse uniquement
+            </label>
           </div>
 
           {/* Expansion Filter */}

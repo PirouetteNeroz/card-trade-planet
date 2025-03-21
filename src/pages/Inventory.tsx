@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -6,7 +7,7 @@ import FilterPanel, { FilterState } from "@/components/FilterPanel";
 import { Card, CartItem, fetchInventory, fetchExpansions, saveCartToLocalStorage, loadCartFromLocalStorage } from "@/lib/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Grid, List, Loader2, LayoutGrid, Filter, Search } from "lucide-react";
+import { Grid, List, Loader2, LayoutGrid, Filter, Search, Sparkles, Languages, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -28,6 +29,8 @@ export default function Inventory() {
     condition: "",
     expansion: "",
     priceRange: [0, 1000],
+    language: "",
+    isReverse: false
   });
   
   const location = useLocation();
@@ -90,6 +93,14 @@ export default function Inventory() {
       filtered = filtered.filter(card => card.condition === activeFilters.condition);
     }
     
+    if (activeFilters.language) {
+      filtered = filtered.filter(card => card.language === activeFilters.language);
+    }
+    
+    if (activeFilters.isReverse) {
+      filtered = filtered.filter(card => card.isReverse);
+    }
+    
     filtered = filtered.filter(card => 
       card.price >= activeFilters.priceRange[0] && 
       card.price <= activeFilters.priceRange[1]
@@ -115,10 +126,30 @@ export default function Inventory() {
     
     if (existingItem) {
       existingItem.quantity += 1;
+      
+      // Ensure we don't exceed available quantity
+      if (existingItem.quantity > card.quantity) {
+        existingItem.quantity = card.quantity;
+        toast({
+          title: "Quantité maximum atteinte",
+          description: `Vous ne pouvez pas ajouter plus de ${card.quantity} exemplaires de cette carte.`,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Carte ajoutée au panier",
+          description: `${card.name_fr || card.name_en} (${existingItem.quantity}x)`,
+        });
+      }
     } else {
       newCart.push({
         ...card,
         quantity: 1
+      });
+      
+      toast({
+        title: "Carte ajoutée au panier",
+        description: card.name_fr || card.name_en,
       });
     }
     
@@ -132,6 +163,8 @@ export default function Inventory() {
     if (activeFilters.rarity) count++;
     if (activeFilters.condition) count++;
     if (activeFilters.expansion) count++;
+    if (activeFilters.language) count++;
+    if (activeFilters.isReverse) count++;
     if (activeFilters.priceRange[0] > 0 || activeFilters.priceRange[1] < 1000) count++;
     return count;
   };
@@ -143,8 +176,26 @@ export default function Inventory() {
       condition: "",
       expansion: "",
       priceRange: [0, 1000],
+      language: "",
+      isReverse: false
     });
     setSearchQuery("");
+  };
+
+  const getLanguageLabel = (code: string) => {
+    const languages: Record<string, string> = {
+      en: 'Anglais',
+      fr: 'Français',
+      de: 'Allemand',
+      es: 'Espagnol',
+      it: 'Italien',
+      pt: 'Portugais',
+      jp: 'Japonais',
+      ko: 'Coréen',
+      cn: 'Chinois',
+      ru: 'Russe'
+    };
+    return languages[code] || code.toUpperCase();
   };
 
   return (
@@ -228,6 +279,16 @@ export default function Inventory() {
                   État: {activeFilters.condition}
                 </Badge>
               )}
+              {activeFilters.language && (
+                <Badge variant="secondary" className="text-xs">
+                  Langue: {getLanguageLabel(activeFilters.language)}
+                </Badge>
+              )}
+              {activeFilters.isReverse && (
+                <Badge variant="secondary" className="text-xs">
+                  Reverse
+                </Badge>
+              )}
               {activeFilters.expansion && expansions[activeFilters.expansion] && (
                 <Badge variant="secondary" className="text-xs">
                   Extension: {expansions[activeFilters.expansion]}
@@ -287,6 +348,10 @@ export default function Inventory() {
                         expansion_id={card.expansion_id}
                         rarity={card.rarity}
                         blueprint_id={card.blueprint_id}
+                        quantity={card.quantity}
+                        collectorNumber={card.collectorNumber}
+                        language={card.language}
+                        isReverse={card.isReverse}
                         addToCart={handleAddToCart}
                       />
                     ))}
@@ -296,7 +361,7 @@ export default function Inventory() {
                     {filteredInventory.map((card, index) => (
                       <>
                         <div className="flex p-4 animate-fade-in" key={card.id}>
-                          <div className="w-20 h-28 flex-shrink-0 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden mr-4">
+                          <div className="w-20 h-28 flex-shrink-0 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden mr-4 relative">
                             {card.image_url ? (
                               <img
                                 src={card.image_url}
@@ -307,6 +372,11 @@ export default function Inventory() {
                               <div className="w-full h-full flex items-center justify-center text-xs text-center p-2">
                                 {card.name_fr || card.name_en}
                               </div>
+                            )}
+                            {card.isReverse && (
+                              <Badge className="absolute top-1 right-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-1">
+                                <Sparkles className="h-2 w-2" />
+                              </Badge>
                             )}
                           </div>
                           
@@ -322,9 +392,22 @@ export default function Inventory() {
                                 <div className="flex flex-wrap gap-2 mt-1">
                                   <Badge variant="outline" className="text-xs">{card.expansion}</Badge>
                                   <Badge variant="outline" className="text-xs">{card.condition}</Badge>
+                                  
                                   {card.rarity && (
                                     <Badge variant="outline" className="text-xs">{card.rarity}</Badge>
                                   )}
+                                  
+                                  {card.collectorNumber && (
+                                    <Badge variant="outline" className="text-xs">
+                                      <Hash className="h-3 w-3 mr-1" />
+                                      {card.collectorNumber}
+                                    </Badge>
+                                  )}
+                                  
+                                  <Badge variant="outline" className="text-xs">
+                                    <Languages className="h-3 w-3 mr-1" />
+                                    {getLanguageLabel(card.language)}
+                                  </Badge>
                                 </div>
                               </div>
                               
@@ -334,6 +417,9 @@ export default function Inventory() {
                                     style: 'currency',
                                     currency: 'EUR'
                                   }).format(card.price)}
+                                </div>
+                                <div className="text-sm text-slate-600 dark:text-slate-400">
+                                  Stock: {card.quantity}
                                 </div>
                                 <Button 
                                   size="sm" 
