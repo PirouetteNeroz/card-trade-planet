@@ -159,8 +159,11 @@ export default function PokemonCard({
             <Badge variant="outline" className="text-xs">
               {condition}
             </Badge>
-            <div className="text-sm text-slate-500 dark:text-slate-400">
+            <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">
               {expansion}
+            </div>
+            <div className="text-xs text-slate-400 dark:text-slate-500">
+              ID: {expansion_id}
             </div>
           </div>
           

@@ -1,4 +1,3 @@
-
 // API configuration
 const API_PRODUCTS = 'https://api.cardtrader.com/api/v2/products/export';
 const API_EXPANSIONS = 'https://api.cardtrader.com/api/v2/expansions/export';
@@ -92,8 +91,15 @@ export async function fetchInventory(): Promise<Card[]> {
     
     const data = await response.json();
     
+    // Fetch expansions map first
+    const expansionsMap = await fetchExpansions();
+    
     return await Promise.all(data.map(async (card: any) => {
       const frenchName = await fetchFrenchPokemonName(card.name_en.toLowerCase());
+      
+      // Use expansion name from the map or fallback to ID
+      const expansionName = expansionsMap[card.expansion.id] || card.expansion.id;
+      
       return {
         id: card.id,
         name_en: card.name_en,
@@ -101,7 +107,7 @@ export async function fetchInventory(): Promise<Card[]> {
         price: card.price_cents / 100, // Convert cents to euros
         image_url: card.blueprint_id ? `${IMAGE_BASE_URL}${card.blueprint_id}.jpg` : undefined,
         condition: card.properties_hash?.condition || 'Non spécifiée',
-        expansion: card.expansion.name || card.expansion.id,
+        expansion: expansionName,
         expansion_id: card.expansion.id,
         rarity: card.properties_hash?.pokemon_rarity,
         properties_hash: card.properties_hash,

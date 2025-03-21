@@ -82,7 +82,7 @@ export default function CartItem({
         <div className="flex justify-between items-start">
           <div>
             <h3 className="font-medium text-base mb-1">{name}</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">{expansion}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">{expansion}</p>
             <p className="text-xs text-slate-500 dark:text-slate-400">État: {condition}</p>
           </div>
           
