@@ -383,7 +383,15 @@ export default function Inventory() {
                           <div className="flex-grow">
                             <div className="flex justify-between">
                               <div>
-                                <h3 className="font-medium line-clamp-1">{card.name_fr || card.name_en}</h3>
+                                <h3 className="font-medium line-clamp-1">
+                                  {card.name_fr || card.name_en}
+                                  {card.collectorNumber && (
+                                    <span className="ml-2 text-sm text-slate-500">
+                                      <Hash className="h-3 w-3 inline mr-1" />
+                                      {card.collectorNumber}
+                                    </span>
+                                  )}
+                                </h3>
                                 {card.name_fr && card.name_en && card.name_fr !== card.name_en && (
                                   <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
                                     ({card.name_en})
@@ -395,13 +403,6 @@ export default function Inventory() {
                                   
                                   {card.rarity && (
                                     <Badge variant="outline" className="text-xs">{card.rarity}</Badge>
-                                  )}
-                                  
-                                  {card.collectorNumber && (
-                                    <Badge variant="outline" className="text-xs">
-                                      <Hash className="h-3 w-3 mr-1" />
-                                      {card.collectorNumber}
-                                    </Badge>
                                   )}
                                   
                                   <Badge variant="outline" className="text-xs">

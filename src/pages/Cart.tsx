@@ -147,6 +147,8 @@ export default function Cart() {
                     quantity={item.quantity}
                     condition={item.condition}
                     expansion={item.expansion}
+                    collectorNumber={item.collectorNumber}
+                    language={item.language}
                     onUpdateQuantity={updateCartItemQuantity}
                     onRemove={removeCartItem}
                   />

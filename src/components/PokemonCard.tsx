@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -152,6 +151,9 @@ export default function PokemonCard({
               ({name_en})
             </p>
           )}
+          <div className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
+            {expansion}
+          </div>
         </div>
         
         <div className="flex items-center justify-between">
@@ -159,12 +161,6 @@ export default function PokemonCard({
             <Badge variant="outline" className="text-xs">
               {condition}
             </Badge>
-            <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-              {expansion}
-            </div>
-            <div className="text-xs text-slate-400 dark:text-slate-500">
-              ID: {expansion_id}
-            </div>
           </div>
           
           <div className="text-right">

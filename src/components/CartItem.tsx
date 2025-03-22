@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, Hash, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,8 @@ interface CartItemProps {
   quantity: number;
   condition: string;
   expansion: string;
+  collectorNumber?: string;
+  language?: string;
   onUpdateQuantity: (id: string, quantity: number) => void;
   onRemove: (id: string) => void;
 }
@@ -24,6 +26,8 @@ export default function CartItem({
   quantity,
   condition,
   expansion,
+  collectorNumber,
+  language,
   onUpdateQuantity,
   onRemove
 }: CartItemProps) {
@@ -54,6 +58,24 @@ export default function CartItem({
     onRemove(id);
   };
 
+  const getLanguageLabel = (code?: string) => {
+    if (!code) return '';
+    
+    const languages: Record<string, string> = {
+      en: 'Anglais',
+      fr: 'Français',
+      de: 'Allemand',
+      es: 'Espagnol',
+      it: 'Italien',
+      pt: 'Portugais',
+      jp: 'Japonais',
+      ko: 'Coréen',
+      cn: 'Chinois',
+      ru: 'Russe'
+    };
+    return languages[code] || code.toUpperCase();
+  };
+
   return (
     <div className="flex border-b border-slate-200 dark:border-slate-700 py-4 animate-fade-up">
       <div className="w-20 h-28 rounded-md overflow-hidden mr-4 flex-shrink-0">
@@ -81,9 +103,25 @@ export default function CartItem({
       <div className="flex-grow">
         <div className="flex justify-between items-start">
           <div>
-            <h3 className="font-medium text-base mb-1">{name}</h3>
+            <h3 className="font-medium text-base mb-1">
+              {name}
+              {collectorNumber && (
+                <span className="ml-2 text-sm text-slate-500">
+                  <Hash className="h-3 w-3 inline mr-1" />
+                  {collectorNumber}
+                </span>
+              )}
+            </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-1 font-medium">{expansion}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">État: {condition}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-slate-500 dark:text-slate-400">État: {condition}</p>
+              {language && (
+                <p className="text-xs text-slate-500 dark:text-slate-400 flex items-center">
+                  <Languages className="h-3 w-3 mr-1" />
+                  {getLanguageLabel(language)}
+                </p>
+              )}
+            </div>
           </div>
           
           <div className="text-right">
