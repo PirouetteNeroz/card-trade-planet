@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -69,7 +68,7 @@ export default function Inventory() {
     let filtered = [...inventory];
     
     if (activeFilters.expansion) {
-      filtered = filtered.filter(card => card.expansion_id === activeFilters.expansion);
+      filtered = filtered.filter(card => card.expansion === activeFilters.expansion);
     }
     
     if (activeFilters.cardType) {
@@ -127,7 +126,6 @@ export default function Inventory() {
     if (existingItem) {
       existingItem.quantity += 1;
       
-      // Ensure we don't exceed available quantity
       if (existingItem.quantity > card.quantity) {
         existingItem.quantity = card.quantity;
         toast({
@@ -289,9 +287,9 @@ export default function Inventory() {
                   Reverse
                 </Badge>
               )}
-              {activeFilters.expansion && expansions[activeFilters.expansion] && (
+              {activeFilters.expansion && (
                 <Badge variant="secondary" className="text-xs">
-                  Extension: {expansions[activeFilters.expansion]}
+                  Extension: {activeFilters.expansion}
                 </Badge>
               )}
               {(activeFilters.priceRange[0] > 0 || activeFilters.priceRange[1] < 1000) && (

@@ -104,6 +104,9 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
     setActiveFiltersCount(0);
   };
 
+  // Create an array of available extension names from the expansions object
+  const extensionNames = ["", ...Object.values(expansions)];
+
   return (
     <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden transition-all duration-300">
       <div className="p-4 border-b dark:border-slate-700">
@@ -236,7 +239,7 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" className="w-full justify-between">
-                  {filters.expansion ? expansions[filters.expansion] : "Toutes les extensions"}
+                  {filters.expansion || "Toutes les extensions"}
                   <ChevronDown className="h-4 w-4 ml-2" />
                 </Button>
               </DropdownMenuTrigger>
@@ -246,8 +249,8 @@ export default function FilterPanel({ onFilterChange, expansions }: FilterPanelP
                   onValueChange={(value) => handleFilterChange("expansion", value)}
                 >
                   <DropdownMenuRadioItem value="">Toutes</DropdownMenuRadioItem>
-                  {Object.entries(expansions).map(([id, name]) => (
-                    <DropdownMenuRadioItem key={id} value={id}>
+                  {Object.values(expansions).map((name) => (
+                    <DropdownMenuRadioItem key={name} value={name}>
                       {name}
                     </DropdownMenuRadioItem>
                   ))}

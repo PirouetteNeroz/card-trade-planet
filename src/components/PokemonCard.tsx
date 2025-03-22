@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -145,6 +146,12 @@ export default function PokemonCard({
         <div className="mb-2">
           <h3 className="font-medium line-clamp-1 text-base">
             {name_fr || name_en}
+            {collectorNumber && (
+              <span className="ml-2 text-sm text-slate-500">
+                <Hash className="h-3 w-3 inline mr-1" />
+                {collectorNumber}
+              </span>
+            )}
           </h3>
           {name_fr && name_en && name_fr !== name_en && (
             <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
@@ -157,50 +164,53 @@ export default function PokemonCard({
         </div>
         
         <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <Badge variant="outline" className="text-xs">
-              {condition}
-            </Badge>
-          </div>
+          <Badge variant="outline" className="text-xs">
+            {condition}
+          </Badge>
           
           <div className="text-right">
-            <div className="font-bold mb-1">
+            <div className="font-bold mb-2">
               {new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
                 currency: 'EUR'
               }).format(price)}
             </div>
             
-            <div className="flex items-center justify-end mb-2">
-              <Badge variant="outline" className="mr-1">
-                Stock: {quantity}
-              </Badge>
-              <div className="flex items-center border rounded">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-7 w-7 p-0"
-                  onClick={decrementQuantity}
-                  disabled={cartQuantity <= 1}
-                >
-                  <Minus className="h-3 w-3" />
-                </Button>
-                <span className="w-6 text-center text-sm">{cartQuantity}</span>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-7 w-7 p-0"
-                  onClick={incrementQuantity}
-                  disabled={cartQuantity >= quantity}
-                >
-                  <Plus className="h-3 w-3" />
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center justify-end">
+                <Badge variant="outline" className="mr-2">
+                  Stock: {quantity}
+                </Badge>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <div className="flex items-center border rounded">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7 p-0"
+                    onClick={decrementQuantity}
+                    disabled={cartQuantity <= 1}
+                  >
+                    <Minus className="h-3 w-3" />
+                  </Button>
+                  <span className="w-6 text-center text-sm">{cartQuantity}</span>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-7 w-7 p-0"
+                    onClick={incrementQuantity}
+                    disabled={cartQuantity >= quantity}
+                  >
+                    <Plus className="h-3 w-3" />
+                  </Button>
+                </div>
+                
+                <Button size="sm" onClick={handleAddToCart}>
+                  Ajouter
                 </Button>
               </div>
             </div>
-            
-            <Button size="sm" onClick={handleAddToCart}>
-              Ajouter
-            </Button>
           </div>
         </div>
       </CardContent>
