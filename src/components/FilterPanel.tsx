@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { ChevronDown, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -68,10 +67,8 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
   };
 
   const handleFilterChange = (key: keyof FilterState, value: any) => {
-    // Make sure priceRange is always a tuple of [number, number]
     let updatedValue = value;
     if (key === 'priceRange' && Array.isArray(value)) {
-      // Ensure it's a tuple with exactly 2 elements
       updatedValue = [
         value[0] !== undefined ? value[0] : filters.priceRange[0],
         value[1] !== undefined ? value[1] : filters.priceRange[1]
@@ -82,7 +79,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
     setFilters(newFilters);
     onFilterChange(newFilters);
     
-    // Count active filters
     let count = 0;
     if (newFilters.cardType) count++;
     if (newFilters.rarity) count++;
@@ -109,7 +105,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
     setActiveFiltersCount(0);
   };
 
-  // Create an array of available extension names from the expansions object
   const extensionNames = ["", ...Object.values(expansions)];
 
   return (
@@ -136,7 +131,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Sorting Options */}
         {onSortChange && (
           <div className="mb-4">
             <label className="text-sm font-medium mb-2 block">Trier par</label>
@@ -148,7 +142,7 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
                 <SelectValue placeholder="Choisir un tri" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Par défaut</SelectItem>
+                <SelectItem value="default">Par défaut</SelectItem>
                 <SelectItem value="name-asc">Nom (A-Z)</SelectItem>
                 <SelectItem value="name-desc">Nom (Z-A)</SelectItem>
                 <SelectItem value="number-asc">Numéro de collection ↑</SelectItem>
@@ -158,7 +152,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </div>
         )}
         
-        {/* Card Type Filter */}
         <Collapsible className="w-full">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Type de carte</label>
@@ -172,7 +165,7 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
             <div className="flex flex-wrap gap-2">
               {cardTypes.map((type) => (
                 <Badge
-                  key={type}
+                  key={type || "all-types"}
                   variant={filters.cardType === type ? "default" : "outline"}
                   className="cursor-pointer"
                   onClick={() => handleFilterChange("cardType", type)}
@@ -184,7 +177,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Rarity Filter */}
         <Collapsible className="w-full">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Rareté</label>
@@ -198,7 +190,7 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
             <div className="flex flex-wrap gap-2">
               {rarities.map((rarity) => (
                 <Badge
-                  key={rarity}
+                  key={rarity || "all-rarities"}
                   variant={filters.rarity === rarity ? "default" : "outline"}
                   className="cursor-pointer"
                   onClick={() => handleFilterChange("rarity", rarity)}
@@ -210,7 +202,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Condition Filter */}
         <Collapsible className="w-full">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">État</label>
@@ -224,7 +215,7 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
             <div className="flex flex-wrap gap-2">
               {conditions.map((condition) => (
                 <Badge
-                  key={condition}
+                  key={condition || "all-conditions"}
                   variant={filters.condition === condition ? "default" : "outline"}
                   className="cursor-pointer"
                   onClick={() => handleFilterChange("condition", condition)}
@@ -236,7 +227,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Language Filter */}
         <Collapsible className="w-full">
           <div className="flex items-center justify-between">
             <label className="text-sm font-medium">Langue</label>
@@ -250,7 +240,7 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
             <div className="flex flex-wrap gap-2">
               {languages.map((lang) => (
                 <Badge
-                  key={lang}
+                  key={lang || "all-languages"}
                   variant={filters.language === lang ? "default" : "outline"}
                   className="cursor-pointer"
                   onClick={() => handleFilterChange("language", lang)}
@@ -262,7 +252,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </CollapsibleContent>
         </Collapsible>
 
-        {/* Reverse Filter */}
         <div className="flex items-center space-x-2">
           <Checkbox
             id="reverse"
@@ -277,7 +266,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </label>
         </div>
 
-        {/* Expansion Filter */}
         <div>
           <label className="text-sm font-medium mb-1 block">Extension</label>
           <Select 
@@ -288,7 +276,7 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
               <SelectValue placeholder="Toutes les extensions" />
             </SelectTrigger>
             <SelectContent className="max-h-60">
-              <SelectItem value="">Toutes</SelectItem>
+              <SelectItem value="all">Toutes</SelectItem>
               {Object.values(expansions).map((name) => (
                 <SelectItem key={name} value={name}>
                   {name}
@@ -298,7 +286,6 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
           </Select>
         </div>
 
-        {/* Price Range Filter */}
         <div>
           <div className="flex justify-between mb-1">
             <label className="text-sm font-medium">Prix</label>
