@@ -18,7 +18,8 @@ export function findSeriesIdByName(seriesName: string): string | undefined {
   
   // Recherche partielle si la recherche exacte échoue
   for (const [id, name] of Object.entries(mapping)) {
-    if (name.includes(seriesName) || seriesName.includes(name)) {
+    if (name.toLowerCase().includes(seriesName.toLowerCase()) || 
+        seriesName.toLowerCase().includes(name.toLowerCase())) {
       return id;
     }
   }

@@ -1,102 +1,55 @@
 
-import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import SeriesCard from './SeriesCard';
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
-} from '@/components/ui/accordion';
-import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { Link } from "react-router-dom";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { ChevronRight } from "lucide-react";
+import SeriesCard from "./SeriesCard";
 import seriesBlocksData from '@/data/seriesBlocks.json';
 
-interface SeriesBlocksGridProps {
+interface SeriesGridProps {
   series: any[];
 }
 
-const SeriesBlocksGrid: React.FC<SeriesBlocksGridProps> = ({ series }) => {
-  // Organiser les séries par bloc en utilisant le fichier JSON
-  const seriesByBlock = useMemo(() => {
-    const blocks: Record<string, any[]> = {};
-    
-    // Initialiser les blocs depuis le fichier JSON
-    seriesBlocksData.blocks.forEach(block => {
-      blocks[block.name] = [];
-    });
-    
-    // Fonction pour trouver le nom du bloc d'une série
-    const getBlockName = (seriesName: string): string => {
-      // Chercher dans le mapping de seriesBlocks.json
-      for (const block of seriesBlocksData.blocks) {
-        const matchingSeries = block.series.find((s: any) => 
-          seriesName.includes(s.name) || s.name.includes(seriesName)
-        );
-        if (matchingSeries) {
-          return block.name;
-        }
-      }
-      
-      // Si aucune correspondance n'est trouvée, utiliser "Autres"
-      return "Autres";
-    };
-    
-    // Assigner chaque série à son bloc
-    series.forEach(serie => {
-      const blockName = getBlockName(serie.name);
-      if (!blocks[blockName]) {
-        blocks[blockName] = [];
-      }
-      blocks[blockName].push(serie);
-    });
-    
-    // Trier les séries dans chaque bloc par date ou par ordre alphabétique
-    Object.keys(blocks).forEach(block => {
-      blocks[block].sort((a, b) => {
-        if (a.releaseDate && b.releaseDate) {
-          return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
-        }
-        return a.name.localeCompare(b.name);
-      });
-    });
-    
-    return blocks;
-  }, [series]);
-
-  // Obtenir les blocs dans l'ordre défini dans le fichier JSON
-  const blockOrder = useMemo(() => {
-    return seriesBlocksData.blocks.map(block => block.name).concat(["Autres"]);
-  }, []);
-
+export default function SeriesBlocksGrid({ series }: SeriesGridProps) {
+  const blocks = seriesBlocksData.blocks;
+  
   return (
-    <Accordion type="multiple" defaultValue={['Écarlate et Violet']} className="space-y-4">
-      {blockOrder
-        .filter(block => seriesByBlock[block] && seriesByBlock[block].length > 0)
-        .map(block => (
-          <AccordionItem 
-            key={block} 
-            value={block}
-            className="border border-border rounded-lg overflow-hidden shadow-sm"
-          >
-            <AccordionTrigger className="px-4 py-3 bg-muted/30 hover:bg-muted/50 font-medium text-lg">
-              {block}
-              <span className="text-sm font-normal text-muted-foreground ml-2">
-                {seriesByBlock[block].length} séries
-              </span>
-            </AccordionTrigger>
-            <AccordionContent className="px-4 py-6">
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {seriesByBlock[block].map(serie => (
-                  <ErrorBoundary key={serie.id}>
-                    <SeriesCard serie={serie} />
-                  </ErrorBoundary>
-                ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-    </Accordion>
+    <div className="space-y-10">
+      {blocks.map((block, index) => (
+        <Card key={block.id} className="overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-slate-100 to-white dark:from-slate-800 dark:to-slate-900 p-6">
+            <h3 className="text-xl font-bold">{block.name}</h3>
+          </CardHeader>
+          
+          <CardContent className="p-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {block.series.map((item) => {
+                // Trouver les données supplémentaires de la série dans notre API
+                const serieData = series.find(s => 
+                  s.id === item.id || s.name === item.name
+                );
+                
+                // Fusionner les données
+                const mergedData = {
+                  ...item,
+                  ...(serieData || {}),
+                  logo_url: item.logo_url || (serieData?.logo_url || ""),
+                  tcgdex_id: item.id
+                };
+                
+                return (
+                  <SeriesCard key={item.id} serie={mergedData} compact />
+                );
+              })}
+            </div>
+            
+            {index < blocks.length - 1 && (
+              <Separator className="mt-6" />
+            )}
+          </CardContent>
+        </Card>
+      ))}
+    </div>
   );
-};
-
-export default SeriesBlocksGrid;
+}

@@ -1,9 +1,11 @@
 
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Navbar from "@/components/Navbar";
 import SeriesBlocksGrid from "@/components/SeriesBlocksGrid";
 import SeriesCard from "@/components/SeriesCard";
+import { findSeriesIdByName } from "@/lib/api-mapping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, TrendingUp, CheckCircle, Clock } from "lucide-react";
@@ -41,7 +43,11 @@ const Index = () => {
           const matchingSeries = seriesBlock.series.find((s: any) => s.name === processedItem.name);
           if (matchingSeries) {
             processedItem.logo_url = matchingSeries.logo_url;
+            processedItem.tcgdex_id = matchingSeries.id;
           }
+        } else {
+          // Try to find a mapping by name
+          processedItem.tcgdex_id = findSeriesIdByName(processedItem.name);
         }
         
         return processedItem;

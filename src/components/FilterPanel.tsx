@@ -1,28 +1,27 @@
-import { useState } from "react";
-import { ChevronDown, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+
+import { useState, useEffect } from "react";
+import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
+import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { 
+  Filter, 
+  Sparkles, 
+  ArrowUpDown,
+  ChevronDown
+} from "lucide-react";
+import { 
   Collapsible,
   CollapsibleContent,
-  CollapsibleTrigger,
+  CollapsibleTrigger
 } from "@/components/ui/collapsible";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
-interface FilterPanelProps {
-  onFilterChange: (filters: FilterState) => void;
-  expansions: Record<string, string>;
-  onSortChange?: (sort: SortOption) => void;
-}
 
 export interface FilterState {
   cardType: string;
@@ -34,14 +33,23 @@ export interface FilterState {
   isReverse: boolean;
 }
 
-export type SortOption = 
-  | "name-asc" 
-  | "name-desc" 
-  | "number-asc" 
-  | "number-desc" 
-  | "";
+export type SortOption = "" | "name-asc" | "name-desc" | "number-asc" | "number-desc";
 
-export default function FilterPanel({ onFilterChange, expansions, onSortChange }: FilterPanelProps) {
+interface FilterPanelProps {
+  onFilterChange: (filters: FilterState) => void;
+  expansions: Record<string, string>;
+  onSortChange: (sort: SortOption) => void;
+  currentFilters?: FilterState;
+  sortOption?: SortOption;
+}
+
+export default function FilterPanel({
+  onFilterChange,
+  expansions,
+  onSortChange,
+  currentFilters,
+  sortOption = ""
+}: FilterPanelProps) {
   const [filters, setFilters] = useState<FilterState>({
     cardType: "",
     rarity: "",
@@ -52,257 +60,278 @@ export default function FilterPanel({ onFilterChange, expansions, onSortChange }
     isReverse: false
   });
   
-  const [activeFiltersCount, setActiveFiltersCount] = useState(0);
+  const [openSections, setOpenSections] = useState({
+    cardType: true,
+    rarity: true,
+    condition: true,
+    expansion: true,
+    price: true,
+    language: true
+  });
 
-  const cardTypes = ["", "Pokémon", "Dresseur", "Énergie"];
-  const rarities = ["", "Common", "Uncommon", "Rare", "Holo Rare", "Ultra Rare", "Secret Rare"];
-  const conditions = ["", "Mint", "Near Mint", "Excellent", "Good", "Played", "Poor"];
-  const languages = ["", "en", "fr", "jp"];
-  
-  const languageLabels: Record<string, string> = {
-    "": "Toutes",
-    "en": "Anglais",
-    "fr": "Français",
-    "jp": "Japonais"
-  };
+  // Update filters if passed in from parent
+  useEffect(() => {
+    if (currentFilters) {
+      setFilters(currentFilters);
+    }
+  }, [currentFilters]);
 
   const handleFilterChange = (key: keyof FilterState, value: any) => {
-    let updatedValue = value;
-    if (key === 'priceRange' && Array.isArray(value)) {
-      updatedValue = [
-        value[0] !== undefined ? value[0] : filters.priceRange[0],
-        value[1] !== undefined ? value[1] : filters.priceRange[1]
-      ] as [number, number];
-    }
-    
-    const newFilters = { ...filters, [key]: updatedValue };
+    const newFilters = { ...filters, [key]: value };
     setFilters(newFilters);
     onFilterChange(newFilters);
-    
-    let count = 0;
-    if (newFilters.cardType) count++;
-    if (newFilters.rarity) count++;
-    if (newFilters.condition) count++;
-    if (newFilters.expansion) count++;
-    if (newFilters.language) count++;
-    if (newFilters.isReverse) count++;
-    if (newFilters.priceRange[0] > 0 || newFilters.priceRange[1] < 1000) count++;
-    setActiveFiltersCount(count);
   };
 
-  const resetFilters = () => {
-    const resetState: FilterState = {
-      cardType: "",
-      rarity: "",
-      condition: "",
-      expansion: "",
-      priceRange: [0, 1000],
-      language: "",
-      isReverse: false
-    };
-    setFilters(resetState);
-    onFilterChange(resetState);
-    setActiveFiltersCount(0);
+  const handlePriceChange = (value: number[]) => {
+    const newFilters = { ...filters, priceRange: [value[0], value[1]] as [number, number] };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
   };
 
-  const extensionNames = ["", ...Object.values(expansions)];
+  const toggleSection = (section: string) => {
+    setOpenSections({
+      ...openSections,
+      [section]: !openSections[section as keyof typeof openSections]
+    });
+  };
+
+  // Card type options
+  const cardTypes = [
+    { value: "all", label: "Tous" },
+    { value: "Pokémon", label: "Pokémon" },
+    { value: "Énergie", label: "Énergie" },
+    { value: "Dresseur", label: "Dresseur" }
+  ];
+
+  // Rarity options
+  const rarities = [
+    { value: "all", label: "Toutes" },
+    { value: "Common", label: "Commune" },
+    { value: "Uncommon", label: "Peu commune" },
+    { value: "Rare", label: "Rare" },
+    { value: "Ultra Rare", label: "Ultra Rare" },
+    { value: "Secret Rare", label: "Secrète" }
+  ];
+
+  // Condition options
+  const conditions = [
+    { value: "all", label: "Tous" },
+    { value: "Mint", label: "Mint" },
+    { value: "Near Mint", label: "Near Mint" },
+    { value: "Excellent", label: "Excellent" },
+    { value: "Good", label: "Good" },
+    { value: "Light Played", label: "Light Played" },
+    { value: "Played", label: "Played" },
+    { value: "Poor", label: "Poor" }
+  ];
+
+  // Language options
+  const languages = [
+    { value: "all", label: "Toutes" },
+    { value: "en", label: "Anglais" },
+    { value: "fr", label: "Français" },
+    { value: "jp", label: "Japonais" }
+  ];
+
+  // Sort options
+  const sortOptions = [
+    { value: "", label: "Trier par..." },
+    { value: "name-asc", label: "Nom (A-Z)" },
+    { value: "name-desc", label: "Nom (Z-A)" },
+    { value: "number-asc", label: "Numéro ↑" },
+    { value: "number-desc", label: "Numéro ↓" }
+  ];
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden">
-      <div className="p-4 border-b dark:border-slate-700">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <h3 className="font-medium">Filtres</h3>
-            {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="ml-2">
-                {activeFiltersCount}
-              </Badge>
-            )}
-          </div>
-          <div className="flex items-center space-x-2">
-            {activeFiltersCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={resetFilters}>
-                <X className="h-3.5 w-3.5 mr-1" />
-                Réinitialiser
-              </Button>
-            )}
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Filter className="h-5 w-5 text-primary" />
+        <h2 className="font-semibold text-lg">Filtres</h2>
       </div>
 
-      <div className="p-4 space-y-4">
-        {onSortChange && (
-          <div className="mb-4">
-            <label className="text-sm font-medium mb-2 block">Trier par</label>
-            <Select 
-              onValueChange={(value) => onSortChange(value as SortOption)}
-              defaultValue=""
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choisir un tri" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="default">Par défaut</SelectItem>
-                <SelectItem value="name-asc">Nom (A-Z)</SelectItem>
-                <SelectItem value="name-desc">Nom (Z-A)</SelectItem>
-                <SelectItem value="number-asc">Numéro de collection ↑</SelectItem>
-                <SelectItem value="number-desc">Numéro de collection ↓</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        )}
-        
-        <Collapsible className="w-full">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Type de carte</label>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent className="mt-2">
-            <div className="flex flex-wrap gap-2">
-              {cardTypes.map((type) => (
-                <Badge
-                  key={type || "all-types"}
-                  variant={filters.cardType === type ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => handleFilterChange("cardType", type)}
-                >
-                  {type || "Tous"}
-                </Badge>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
+      {/* Sort Section */}
+      <div className="mb-6">
+        <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Trier par..." />
+          </SelectTrigger>
+          <SelectContent>
+            {sortOptions.map(option => (
+              <SelectItem key={option.value || "default"} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
-        <Collapsible className="w-full">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Rareté</label>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </CollapsibleTrigger>
+      {/* Card Type Section */}
+      <Collapsible open={openSections.cardType} onOpenChange={() => toggleSection("cardType")}>
+        <CollapsibleTrigger asChild>
+          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+            <Label className="font-medium">Type de carte</Label>
+            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.cardType ? "transform rotate-180" : ""}`} />
           </div>
-          <CollapsibleContent className="mt-2">
-            <div className="flex flex-wrap gap-2">
-              {rarities.map((rarity) => (
-                <Badge
-                  key={rarity || "all-rarities"}
-                  variant={filters.rarity === rarity ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => handleFilterChange("rarity", rarity)}
-                >
-                  {rarity || "Toutes"}
-                </Badge>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-
-        <Collapsible className="w-full">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">État</label>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent className="mt-2">
-            <div className="flex flex-wrap gap-2">
-              {conditions.map((condition) => (
-                <Badge
-                  key={condition || "all-conditions"}
-                  variant={filters.condition === condition ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => handleFilterChange("condition", condition)}
-                >
-                  {condition || "Tous"}
-                </Badge>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-
-        <Collapsible className="w-full">
-          <div className="flex items-center justify-between">
-            <label className="text-sm font-medium">Langue</label>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
-                <ChevronDown className="h-4 w-4" />
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <CollapsibleContent className="mt-2">
-            <div className="flex flex-wrap gap-2">
-              {languages.map((lang) => (
-                <Badge
-                  key={lang || "all-languages"}
-                  variant={filters.language === lang ? "default" : "outline"}
-                  className="cursor-pointer"
-                  onClick={() => handleFilterChange("language", lang)}
-                >
-                  {languageLabels[lang]}
-                </Badge>
-              ))}
-            </div>
-          </CollapsibleContent>
-        </Collapsible>
-
-        <div className="flex items-center space-x-2">
-          <Checkbox
-            id="reverse"
-            checked={filters.isReverse}
-            onCheckedChange={(checked) => handleFilterChange("isReverse", !!checked)}
-          />
-          <label
-            htmlFor="reverse"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            Cartes Reverse uniquement
-          </label>
-        </div>
-
-        <div>
-          <label className="text-sm font-medium mb-1 block">Extension</label>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 pb-1">
           <Select 
-            onValueChange={(value) => handleFilterChange("expansion", value)}
-            value={filters.expansion}
+            value={filters.cardType || "all"} 
+            onValueChange={(value) => handleFilterChange("cardType", value === "all" ? "" : value)}
           >
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Toutes les extensions" />
+              <SelectValue placeholder="Tous les types" />
             </SelectTrigger>
-            <SelectContent className="max-h-60">
-              <SelectItem value="all">Toutes</SelectItem>
-              {Object.values(expansions).map((name) => (
-                <SelectItem key={name} value={name}>
-                  {name}
-                </SelectItem>
+            <SelectContent>
+              {cardTypes.map(type => (
+                <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </div>
+        </CollapsibleContent>
+      </Collapsible>
 
-        <div>
-          <div className="flex justify-between mb-1">
-            <label className="text-sm font-medium">Prix</label>
-            <span className="text-sm text-slate-500">
-              {filters.priceRange[0]}€ - {filters.priceRange[1]}€
-            </span>
+      {/* Rarity Section */}
+      <Collapsible open={openSections.rarity} onOpenChange={() => toggleSection("rarity")}>
+        <CollapsibleTrigger asChild>
+          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+            <Label className="font-medium">Rareté</Label>
+            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.rarity ? "transform rotate-180" : ""}`} />
           </div>
-          <Slider
-            defaultValue={[0, 1000]}
-            min={0}
-            max={1000}
-            step={1}
-            value={filters.priceRange}
-            onValueChange={(value) => handleFilterChange("priceRange", value)}
-            className="my-4"
-          />
-        </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 pb-1">
+          <Select 
+            value={filters.rarity || "all"} 
+            onValueChange={(value) => handleFilterChange("rarity", value === "all" ? "" : value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Toutes les raretés" />
+            </SelectTrigger>
+            <SelectContent>
+              {rarities.map(rarity => (
+                <SelectItem key={rarity.value} value={rarity.value}>{rarity.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Condition Section */}
+      <Collapsible open={openSections.condition} onOpenChange={() => toggleSection("condition")}>
+        <CollapsibleTrigger asChild>
+          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+            <Label className="font-medium">État</Label>
+            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.condition ? "transform rotate-180" : ""}`} />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 pb-1">
+          <Select 
+            value={filters.condition || "all"} 
+            onValueChange={(value) => handleFilterChange("condition", value === "all" ? "" : value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Tous les états" />
+            </SelectTrigger>
+            <SelectContent>
+              {conditions.map(condition => (
+                <SelectItem key={condition.value} value={condition.value}>{condition.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Language Section */}
+      <Collapsible open={openSections.language} onOpenChange={() => toggleSection("language")}>
+        <CollapsibleTrigger asChild>
+          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+            <Label className="font-medium">Langue</Label>
+            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.language ? "transform rotate-180" : ""}`} />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 pb-1">
+          <Select 
+            value={filters.language || "all"} 
+            onValueChange={(value) => handleFilterChange("language", value === "all" ? "" : value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Toutes les langues" />
+            </SelectTrigger>
+            <SelectContent>
+              {languages.map(language => (
+                <SelectItem key={language.value} value={language.value}>{language.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Expansion Section */}
+      <Collapsible open={openSections.expansion} onOpenChange={() => toggleSection("expansion")}>
+        <CollapsibleTrigger asChild>
+          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+            <Label className="font-medium">Série</Label>
+            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.expansion ? "transform rotate-180" : ""}`} />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-3 pb-1">
+          <Select 
+            value={filters.expansion} 
+            onValueChange={(value) => handleFilterChange("expansion", value)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Toutes les séries" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Toutes les séries</SelectItem>
+              {Object.entries(expansions).map(([id, name]) => (
+                <SelectItem key={id} value={name}>{name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Price Range Section */}
+      <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
+        <CollapsibleTrigger asChild>
+          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+            <Label className="font-medium">Prix</Label>
+            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? "transform rotate-180" : ""}`} />
+          </div>
+        </CollapsibleTrigger>
+        <CollapsibleContent className="pt-4 pb-1">
+          <div className="space-y-4">
+            <div className="flex justify-between">
+              <span className="text-sm text-slate-600 dark:text-slate-400">
+                {filters.priceRange[0]}€
+              </span>
+              <span className="text-sm text-slate-600 dark:text-slate-400">
+                {filters.priceRange[1]}€
+              </span>
+            </div>
+            <Slider
+              defaultValue={[0, 1000]}
+              value={[filters.priceRange[0], filters.priceRange[1]]}
+              onValueChange={handlePriceChange}
+              max={1000}
+              step={10}
+              className="my-6"
+            />
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+
+      {/* Reverse Holo Switch */}
+      <div className="flex items-center space-x-2 mt-2">
+        <Switch
+          id="reverse"
+          checked={filters.isReverse}
+          onCheckedChange={(checked) => handleFilterChange("isReverse", checked)}
+        />
+        <Label htmlFor="reverse" className="flex items-center gap-1 cursor-pointer">
+          <Sparkles className="h-4 w-4 text-purple-500" />
+          Reverse Holo
+        </Label>
       </div>
     </div>
   );
