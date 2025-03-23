@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Navbar from "@/components/Navbar";
 import SeriesBlocksGrid from "@/components/SeriesBlocksGrid";
+import SeriesCard from "@/components/SeriesCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, TrendingUp, CheckCircle, Clock } from "lucide-react";
