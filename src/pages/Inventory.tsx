@@ -1,10 +1,10 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import PokemonCard from "@/components/PokemonCard";
-import FilterPanel, { FilterState } from "@/components/FilterPanel";
+import FilterPanel, { FilterState, SortOption } from "@/components/FilterPanel";
 import { Card, CartItem, fetchInventory, fetchExpansions, saveCartToLocalStorage, loadCartFromLocalStorage } from "@/lib/api";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Grid, List, Loader2, LayoutGrid, Filter, Search, Sparkles, Languages, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,7 +20,6 @@ export default function Inventory() {
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     cardType: "",
@@ -31,6 +30,7 @@ export default function Inventory() {
     language: "",
     isReverse: false
   });
+  const [sortOption, setSortOption] = useState<SortOption>("");
   
   const location = useLocation();
   const { toast } = useToast();
@@ -112,11 +112,37 @@ export default function Inventory() {
       );
     }
     
+    // Apply sorting
+    if (sortOption) {
+      filtered.sort((a, b) => {
+        switch (sortOption) {
+          case "name-asc":
+            return (a.name_fr || a.name_en).localeCompare(b.name_fr || b.name_en);
+          case "name-desc":
+            return (b.name_fr || b.name_en).localeCompare(a.name_fr || a.name_en);
+          case "number-asc":
+            const numA = parseInt(a.collectorNumber || "0");
+            const numB = parseInt(b.collectorNumber || "0");
+            return numA - numB;
+          case "number-desc":
+            const numADesc = parseInt(a.collectorNumber || "0");
+            const numBDesc = parseInt(b.collectorNumber || "0");
+            return numBDesc - numADesc;
+          default:
+            return 0;
+        }
+      });
+    }
+    
     setFilteredInventory(filtered);
-  }, [inventory, activeFilters, searchQuery]);
+  }, [inventory, activeFilters, searchQuery, sortOption]);
 
   const handleFilterChange = (filters: FilterState) => {
     setActiveFilters(filters);
+  };
+
+  const handleSortChange = (sort: SortOption) => {
+    setSortOption(sort);
   };
 
   const handleAddToCart = (card: Card) => {
@@ -178,20 +204,14 @@ export default function Inventory() {
       isReverse: false
     });
     setSearchQuery("");
+    setSortOption("");
   };
 
   const getLanguageLabel = (code: string) => {
     const languages: Record<string, string> = {
       en: 'Anglais',
       fr: 'Français',
-      de: 'Allemand',
-      es: 'Espagnol',
-      it: 'Italien',
-      pt: 'Portugais',
-      jp: 'Japonais',
-      ko: 'Coréen',
-      cn: 'Chinois',
-      ru: 'Russe'
+      jp: 'Japonais'
     };
     return languages[code] || code.toUpperCase();
   };
@@ -220,19 +240,6 @@ export default function Inventory() {
             </div>
             
             <div className="flex items-center space-x-2">
-              <Button
-                variant={showFilters ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className="sm:hidden"
-              >
-                <Filter className="h-4 w-4 mr-2" />
-                Filtres
-                {getActiveFiltersCount() > 0 && (
-                  <Badge variant="secondary" className="ml-1">{getActiveFiltersCount()}</Badge>
-                )}
-              </Button>
-              
               <div className="hidden sm:flex items-center border rounded-md">
                 <Button
                   variant={viewMode === "grid" ? "ghost" : "ghost"}
@@ -305,16 +312,17 @@ export default function Inventory() {
         </div>
         
         <div className="flex flex-col sm:flex-row">
-          <div className={cn(
-            "w-full sm:w-64 px-4 sm:px-0 sm:pl-6 flex-shrink-0 transition-all duration-300 overflow-hidden",
-            showFilters ? "block" : "hidden sm:block"
-          )}>
+          <div className="w-full sm:w-64 px-4 sm:px-0 sm:pl-6 flex-shrink-0">
             <div className="sticky top-24">
-              <FilterPanel onFilterChange={handleFilterChange} expansions={expansions} />
+              <FilterPanel 
+                onFilterChange={handleFilterChange} 
+                expansions={expansions} 
+                onSortChange={handleSortChange}
+              />
             </div>
           </div>
           
-          <div className="flex-grow px-4 sm:px-6">
+          <div className="flex-grow px-4 sm:px-6 mt-6 sm:mt-0">
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />

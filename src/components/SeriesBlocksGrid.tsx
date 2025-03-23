@@ -9,89 +9,64 @@ import {
   AccordionTrigger 
 } from '@/components/ui/accordion';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
-
-// Mapping des générations de Pokémon
-const GENERATION_MAPPING = {
-  'Base': ['Base', 'Jungle', 'Fossil', 'Base Set 2', 'Team Rocket'],
-  'Neo': ['Neo Genesis', 'Neo Discovery', 'Neo Revelation', 'Neo Destiny'],
-  'Épée et Bouclier': ['Sword & Shield', 'Rebel Clash', 'Darkness Ablaze', 'Vivid Voltage', 'Battle Styles', 'Chilling Reign', 'Evolving Skies', 'Fusion Strike', 'Brilliant Stars', 'Astral Radiance', 'Lost Origin', 'Silver Tempest', 'Crown Zenith'],
-  'Soleil et Lune': ['Sun & Moon', 'Guardians Rising', 'Burning Shadows', 'Crimson Invasion', 'Ultra Prism', 'Forbidden Light', 'Celestial Storm', 'Lost Thunder', 'Team Up', 'Unbroken Bonds', 'Unified Minds', 'Cosmic Eclipse'],
-  'XY': ['XY', 'Flashfire', 'Furious Fists', 'Phantom Forces', 'Primal Clash', 'Roaring Skies', 'Ancient Origins', 'BREAKthrough', 'BREAKpoint', 'Fates Collide', 'Steam Siege', 'Evolutions'],
-  'Noir et Blanc': ['Black & White', 'Emerging Powers', 'Noble Victories', 'Next Destinies', 'Dark Explorers', 'Dragons Exalted', 'Boundaries Crossed', 'Plasma Storm', 'Plasma Freeze', 'Plasma Blast', 'Legendary Treasures'],
-  'Diamant et Perle': ['Diamond & Pearl', 'Mysterious Treasures', 'Secret Wonders', 'Great Encounters', 'Majestic Dawn', 'Legends Awakened', 'Stormfront', 'Platinum', 'Rising Rivals', 'Supreme Victors', 'Arceus'],
-  'EX': ['EX Ruby & Sapphire', 'EX Sandstorm', 'EX Dragon', 'EX Team Magma vs Team Aqua', 'EX Hidden Legends', 'EX FireRed & LeafGreen', 'EX Team Rocket Returns', 'EX Deoxys', 'EX Emerald', 'EX Unseen Forces', 'EX Delta Species', 'EX Legend Maker', 'EX Holon Phantoms', 'EX Crystal Guardians', 'EX Dragon Frontiers', 'EX Power Keepers'],
-  'Écarlate et Violet': ['Scarlet & Violet', 'Paldea Evolved', 'Obsidian Flames', 'Paradox Rift', 'Temporal Forces'],
-  'Spécial': ['Celebrations', 'Shining Fates', 'Hidden Fates', 'Detective Pikachu', 'Shining Legends', 'Dragon Majesty'],
-};
-
-// Déterminer le bloc d'une série
-const getSeriesBlock = (seriesName: string): string => {
-  for (const [block, series] of Object.entries(GENERATION_MAPPING)) {
-    if (series.some(s => seriesName.includes(s))) {
-      return block;
-    }
-  }
-  
-  // Vérifications par mot-clé
-  if (seriesName.includes('EX')) return 'EX';
-  if (seriesName.includes('GX')) return 'Soleil et Lune';
-  if (seriesName.includes('V') || seriesName.includes('VMAX') || seriesName.includes('VSTAR')) return 'Épée et Bouclier';
-  if (seriesName.includes('ex')) return 'ex';
-  
-  return 'Autres';
-};
-
-// Tri des séries par date (du plus récent au plus ancien)
-const sortSeriesByDate = (a: any, b: any) => {
-  if (!a.releaseDate && !b.releaseDate) return 0;
-  if (!a.releaseDate) return 1;
-  if (!b.releaseDate) return -1;
-  return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
-};
+import seriesBlocksData from '@/data/seriesBlocks.json';
 
 interface SeriesBlocksGridProps {
   series: any[];
 }
 
 const SeriesBlocksGrid: React.FC<SeriesBlocksGridProps> = ({ series }) => {
-  // Organiser les séries par bloc
+  // Organiser les séries par bloc en utilisant le fichier JSON
   const seriesByBlock = useMemo(() => {
     const blocks: Record<string, any[]> = {};
     
-    series.forEach(serie => {
-      const block = getSeriesBlock(serie.name);
-      if (!blocks[block]) {
-        blocks[block] = [];
-      }
-      blocks[block].push(serie);
+    // Initialiser les blocs depuis le fichier JSON
+    seriesBlocksData.blocks.forEach(block => {
+      blocks[block.name] = [];
     });
     
-    // Trier les séries dans chaque bloc
+    // Fonction pour trouver le nom du bloc d'une série
+    const getBlockName = (seriesName: string): string => {
+      // Chercher dans le mapping de seriesBlocks.json
+      for (const block of seriesBlocksData.blocks) {
+        const matchingSeries = block.series.find((s: any) => 
+          seriesName.includes(s.name) || s.name.includes(seriesName)
+        );
+        if (matchingSeries) {
+          return block.name;
+        }
+      }
+      
+      // Si aucune correspondance n'est trouvée, utiliser "Autres"
+      return "Autres";
+    };
+    
+    // Assigner chaque série à son bloc
+    series.forEach(serie => {
+      const blockName = getBlockName(serie.name);
+      if (!blocks[blockName]) {
+        blocks[blockName] = [];
+      }
+      blocks[blockName].push(serie);
+    });
+    
+    // Trier les séries dans chaque bloc par date ou par ordre alphabétique
     Object.keys(blocks).forEach(block => {
-      blocks[block].sort(sortSeriesByDate);
+      blocks[block].sort((a, b) => {
+        if (a.releaseDate && b.releaseDate) {
+          return new Date(b.releaseDate).getTime() - new Date(a.releaseDate).getTime();
+        }
+        return a.name.localeCompare(b.name);
+      });
     });
     
     return blocks;
   }, [series]);
 
-  // Obtenir les blocs triés par ordre chronologique inversé
+  // Obtenir les blocs dans l'ordre défini dans le fichier JSON
   const blockOrder = useMemo(() => {
-    const blocksByImportance = [
-      'Écarlate et Violet',
-      'Épée et Bouclier',
-      'Soleil et Lune',
-      'XY',
-      'Noir et Blanc',
-      'Diamant et Perle',
-      'EX',
-      'Neo',
-      'Base',
-      'Spécial',
-      'Autres'
-    ];
-    
-    return [...new Set([...blocksByImportance, ...Object.keys(seriesByBlock)])];
-  }, [seriesByBlock]);
+    return seriesBlocksData.blocks.map(block => block.name).concat(["Autres"]);
+  }, []);
 
   return (
     <Accordion type="multiple" defaultValue={['Écarlate et Violet']} className="space-y-4">

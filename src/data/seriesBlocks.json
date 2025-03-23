@@ -1,0 +1,584 @@
+
+{
+  "blocks": [
+    {
+      "id": "scarlet-violet",
+      "name": "Écarlate et Violet",
+      "series": [
+        {
+          "id": "sv01",
+          "name": "Scarlet & Violet",
+          "logo_url": "/images/series/sv01.png"
+        },
+        {
+          "id": "sv02",
+          "name": "Paldea Evolved",
+          "logo_url": "/images/series/sv02.png"
+        },
+        {
+          "id": "sv03",
+          "name": "Obsidian Flames",
+          "logo_url": "/images/series/sv03.png"
+        },
+        {
+          "id": "sv04",
+          "name": "Paradox Rift",
+          "logo_url": "/images/series/sv04.png"
+        },
+        {
+          "id": "sv05",
+          "name": "Temporal Forces",
+          "logo_url": "/images/series/sv05.png"
+        }
+      ]
+    },
+    {
+      "id": "sword-shield",
+      "name": "Épée et Bouclier",
+      "series": [
+        {
+          "id": "swsh01",
+          "name": "Sword & Shield",
+          "logo_url": "/images/series/swsh01.png"
+        },
+        {
+          "id": "swsh02",
+          "name": "Rebel Clash",
+          "logo_url": "/images/series/swsh02.png"
+        },
+        {
+          "id": "swsh03",
+          "name": "Darkness Ablaze",
+          "logo_url": "/images/series/swsh03.png"
+        },
+        {
+          "id": "swsh04",
+          "name": "Vivid Voltage",
+          "logo_url": "/images/series/swsh04.png"
+        },
+        {
+          "id": "swsh05",
+          "name": "Battle Styles",
+          "logo_url": "/images/series/swsh05.png"
+        },
+        {
+          "id": "swsh06",
+          "name": "Chilling Reign",
+          "logo_url": "/images/series/swsh06.png"
+        },
+        {
+          "id": "swsh07",
+          "name": "Evolving Skies",
+          "logo_url": "/images/series/swsh07.png"
+        },
+        {
+          "id": "swsh08",
+          "name": "Fusion Strike",
+          "logo_url": "/images/series/swsh08.png"
+        },
+        {
+          "id": "swsh09",
+          "name": "Brilliant Stars",
+          "logo_url": "/images/series/swsh09.png"
+        },
+        {
+          "id": "swsh10",
+          "name": "Astral Radiance",
+          "logo_url": "/images/series/swsh10.png"
+        },
+        {
+          "id": "swsh11",
+          "name": "Lost Origin",
+          "logo_url": "/images/series/swsh11.png"
+        },
+        {
+          "id": "swsh12",
+          "name": "Silver Tempest",
+          "logo_url": "/images/series/swsh12.png"
+        },
+        {
+          "id": "swsh13",
+          "name": "Crown Zenith",
+          "logo_url": "/images/series/swsh13.png"
+        }
+      ]
+    },
+    {
+      "id": "sun-moon",
+      "name": "Soleil et Lune",
+      "series": [
+        {
+          "id": "sm01",
+          "name": "Sun & Moon",
+          "logo_url": "/images/series/sm01.png"
+        },
+        {
+          "id": "sm02",
+          "name": "Guardians Rising",
+          "logo_url": "/images/series/sm02.png"
+        },
+        {
+          "id": "sm03",
+          "name": "Burning Shadows",
+          "logo_url": "/images/series/sm03.png"
+        },
+        {
+          "id": "sm04",
+          "name": "Crimson Invasion",
+          "logo_url": "/images/series/sm04.png"
+        },
+        {
+          "id": "sm05",
+          "name": "Ultra Prism",
+          "logo_url": "/images/series/sm05.png"
+        },
+        {
+          "id": "sm06",
+          "name": "Forbidden Light",
+          "logo_url": "/images/series/sm06.png"
+        },
+        {
+          "id": "sm07",
+          "name": "Celestial Storm",
+          "logo_url": "/images/series/sm07.png"
+        },
+        {
+          "id": "sm08",
+          "name": "Lost Thunder",
+          "logo_url": "/images/series/sm08.png"
+        },
+        {
+          "id": "sm09",
+          "name": "Team Up",
+          "logo_url": "/images/series/sm09.png"
+        },
+        {
+          "id": "sm10",
+          "name": "Unbroken Bonds",
+          "logo_url": "/images/series/sm10.png"
+        },
+        {
+          "id": "sm11",
+          "name": "Unified Minds",
+          "logo_url": "/images/series/sm11.png"
+        },
+        {
+          "id": "sm12",
+          "name": "Cosmic Eclipse",
+          "logo_url": "/images/series/sm12.png"
+        }
+      ]
+    },
+    {
+      "id": "xy",
+      "name": "XY",
+      "series": [
+        {
+          "id": "xy01",
+          "name": "XY",
+          "logo_url": "/images/series/xy01.png"
+        },
+        {
+          "id": "xy02",
+          "name": "Flashfire",
+          "logo_url": "/images/series/xy02.png"
+        },
+        {
+          "id": "xy03",
+          "name": "Furious Fists",
+          "logo_url": "/images/series/xy03.png"
+        },
+        {
+          "id": "xy04",
+          "name": "Phantom Forces",
+          "logo_url": "/images/series/xy04.png"
+        },
+        {
+          "id": "xy05",
+          "name": "Primal Clash",
+          "logo_url": "/images/series/xy05.png"
+        },
+        {
+          "id": "xy06",
+          "name": "Roaring Skies",
+          "logo_url": "/images/series/xy06.png"
+        },
+        {
+          "id": "xy07",
+          "name": "Ancient Origins",
+          "logo_url": "/images/series/xy07.png"
+        },
+        {
+          "id": "xy08",
+          "name": "BREAKthrough",
+          "logo_url": "/images/series/xy08.png"
+        },
+        {
+          "id": "xy09",
+          "name": "BREAKpoint",
+          "logo_url": "/images/series/xy09.png"
+        },
+        {
+          "id": "xy10",
+          "name": "Fates Collide",
+          "logo_url": "/images/series/xy10.png"
+        },
+        {
+          "id": "xy11",
+          "name": "Steam Siege",
+          "logo_url": "/images/series/xy11.png"
+        },
+        {
+          "id": "xy12",
+          "name": "Evolutions",
+          "logo_url": "/images/series/xy12.png"
+        }
+      ]
+    },
+    {
+      "id": "black-white",
+      "name": "Noir et Blanc",
+      "series": [
+        {
+          "id": "bw01",
+          "name": "Black & White",
+          "logo_url": "/images/series/bw01.png"
+        },
+        {
+          "id": "bw02",
+          "name": "Emerging Powers",
+          "logo_url": "/images/series/bw02.png"
+        },
+        {
+          "id": "bw03",
+          "name": "Noble Victories",
+          "logo_url": "/images/series/bw03.png"
+        },
+        {
+          "id": "bw04",
+          "name": "Next Destinies",
+          "logo_url": "/images/series/bw04.png"
+        },
+        {
+          "id": "bw05",
+          "name": "Dark Explorers",
+          "logo_url": "/images/series/bw05.png"
+        },
+        {
+          "id": "bw06",
+          "name": "Dragons Exalted",
+          "logo_url": "/images/series/bw06.png"
+        },
+        {
+          "id": "bw07",
+          "name": "Boundaries Crossed",
+          "logo_url": "/images/series/bw07.png"
+        },
+        {
+          "id": "bw08",
+          "name": "Plasma Storm",
+          "logo_url": "/images/series/bw08.png"
+        },
+        {
+          "id": "bw09",
+          "name": "Plasma Freeze",
+          "logo_url": "/images/series/bw09.png"
+        },
+        {
+          "id": "bw10",
+          "name": "Plasma Blast",
+          "logo_url": "/images/series/bw10.png"
+        },
+        {
+          "id": "bw11",
+          "name": "Legendary Treasures",
+          "logo_url": "/images/series/bw11.png"
+        }
+      ]
+    },
+    {
+      "id": "diamond-pearl",
+      "name": "Diamant et Perle",
+      "series": [
+        {
+          "id": "dp01",
+          "name": "Diamond & Pearl",
+          "logo_url": "/images/series/dp01.png"
+        },
+        {
+          "id": "dp02",
+          "name": "Mysterious Treasures",
+          "logo_url": "/images/series/dp02.png"
+        },
+        {
+          "id": "dp03",
+          "name": "Secret Wonders",
+          "logo_url": "/images/series/dp03.png"
+        },
+        {
+          "id": "dp04",
+          "name": "Great Encounters",
+          "logo_url": "/images/series/dp04.png"
+        },
+        {
+          "id": "dp05",
+          "name": "Majestic Dawn",
+          "logo_url": "/images/series/dp05.png"
+        },
+        {
+          "id": "dp06",
+          "name": "Legends Awakened",
+          "logo_url": "/images/series/dp06.png"
+        },
+        {
+          "id": "dp07",
+          "name": "Stormfront",
+          "logo_url": "/images/series/dp07.png"
+        },
+        {
+          "id": "dp08",
+          "name": "Platinum",
+          "logo_url": "/images/series/dp08.png"
+        },
+        {
+          "id": "dp09",
+          "name": "Rising Rivals",
+          "logo_url": "/images/series/dp09.png"
+        },
+        {
+          "id": "dp10",
+          "name": "Supreme Victors",
+          "logo_url": "/images/series/dp10.png"
+        },
+        {
+          "id": "dp11",
+          "name": "Arceus",
+          "logo_url": "/images/series/dp11.png"
+        }
+      ]
+    },
+    {
+      "id": "ex",
+      "name": "EX",
+      "series": [
+        {
+          "id": "ex01",
+          "name": "EX Ruby & Sapphire",
+          "logo_url": "/images/series/ex01.png"
+        },
+        {
+          "id": "ex02",
+          "name": "EX Sandstorm",
+          "logo_url": "/images/series/ex02.png"
+        },
+        {
+          "id": "ex03",
+          "name": "EX Dragon",
+          "logo_url": "/images/series/ex03.png"
+        },
+        {
+          "id": "ex04",
+          "name": "EX Team Magma vs Team Aqua",
+          "logo_url": "/images/series/ex04.png"
+        },
+        {
+          "id": "ex05",
+          "name": "EX Hidden Legends",
+          "logo_url": "/images/series/ex05.png"
+        },
+        {
+          "id": "ex06",
+          "name": "EX FireRed & LeafGreen",
+          "logo_url": "/images/series/ex06.png"
+        },
+        {
+          "id": "ex07",
+          "name": "EX Team Rocket Returns",
+          "logo_url": "/images/series/ex07.png"
+        },
+        {
+          "id": "ex08",
+          "name": "EX Deoxys",
+          "logo_url": "/images/series/ex08.png"
+        },
+        {
+          "id": "ex09",
+          "name": "EX Emerald",
+          "logo_url": "/images/series/ex09.png"
+        },
+        {
+          "id": "ex10",
+          "name": "EX Unseen Forces",
+          "logo_url": "/images/series/ex10.png"
+        },
+        {
+          "id": "ex11",
+          "name": "EX Delta Species",
+          "logo_url": "/images/series/ex11.png"
+        },
+        {
+          "id": "ex12",
+          "name": "EX Legend Maker",
+          "logo_url": "/images/series/ex12.png"
+        },
+        {
+          "id": "ex13",
+          "name": "EX Holon Phantoms",
+          "logo_url": "/images/series/ex13.png"
+        },
+        {
+          "id": "ex14",
+          "name": "EX Crystal Guardians",
+          "logo_url": "/images/series/ex14.png"
+        },
+        {
+          "id": "ex15",
+          "name": "EX Dragon Frontiers",
+          "logo_url": "/images/series/ex15.png"
+        },
+        {
+          "id": "ex16",
+          "name": "EX Power Keepers",
+          "logo_url": "/images/series/ex16.png"
+        }
+      ]
+    },
+    {
+      "id": "neo",
+      "name": "Neo",
+      "series": [
+        {
+          "id": "neo1",
+          "name": "Neo Genesis",
+          "logo_url": "/images/series/neo1.png"
+        },
+        {
+          "id": "neo2",
+          "name": "Neo Discovery",
+          "logo_url": "/images/series/neo2.png"
+        },
+        {
+          "id": "neo3",
+          "name": "Neo Revelation",
+          "logo_url": "/images/series/neo3.png"
+        },
+        {
+          "id": "neo4",
+          "name": "Neo Destiny",
+          "logo_url": "/images/series/neo4.png"
+        }
+      ]
+    },
+    {
+      "id": "base",
+      "name": "Base",
+      "series": [
+        {
+          "id": "base1",
+          "name": "Base",
+          "logo_url": "/images/series/base1.png"
+        },
+        {
+          "id": "base2",
+          "name": "Jungle",
+          "logo_url": "/images/series/base2.png"
+        },
+        {
+          "id": "base3",
+          "name": "Fossil",
+          "logo_url": "/images/series/base3.png"
+        },
+        {
+          "id": "base4",
+          "name": "Base Set 2",
+          "logo_url": "/images/series/base4.png"
+        },
+        {
+          "id": "base5",
+          "name": "Team Rocket",
+          "logo_url": "/images/series/base5.png"
+        }
+      ]
+    },
+    {
+      "id": "special",
+      "name": "Spécial",
+      "series": [
+        {
+          "id": "cel25",
+          "name": "Celebrations",
+          "logo_url": "/images/series/cel25.png"
+        },
+        {
+          "id": "swsh45",
+          "name": "Shining Fates",
+          "logo_url": "/images/series/swsh45.png"
+        },
+        {
+          "id": "sm115",
+          "name": "Hidden Fates",
+          "logo_url": "/images/series/sm115.png"
+        },
+        {
+          "id": "det1",
+          "name": "Detective Pikachu",
+          "logo_url": "/images/series/det1.png"
+        },
+        {
+          "id": "sm75",
+          "name": "Shining Legends",
+          "logo_url": "/images/series/sm75.png"
+        },
+        {
+          "id": "sm76",
+          "name": "Dragon Majesty",
+          "logo_url": "/images/series/sm76.png"
+        }
+      ]
+    }
+  ],
+  "seriesMapping": {
+    "sv01": "Scarlet & Violet",
+    "sv02": "Paldea Evolved",
+    "sv03": "Obsidian Flames",
+    "sv04": "Paradox Rift",
+    "sv05": "Temporal Forces",
+    "swsh01": "Sword & Shield",
+    "swsh02": "Rebel Clash",
+    "swsh03": "Darkness Ablaze",
+    "swsh04": "Vivid Voltage",
+    "swsh05": "Battle Styles",
+    "swsh06": "Chilling Reign",
+    "swsh07": "Evolving Skies",
+    "swsh08": "Fusion Strike",
+    "swsh09": "Brilliant Stars",
+    "swsh10": "Astral Radiance",
+    "swsh11": "Lost Origin",
+    "swsh12": "Silver Tempest",
+    "swsh13": "Crown Zenith",
+    "sm01": "Sun & Moon",
+    "sm02": "Guardians Rising",
+    "sm03": "Burning Shadows",
+    "sm04": "Crimson Invasion",
+    "sm05": "Ultra Prism",
+    "sm06": "Forbidden Light",
+    "sm07": "Celestial Storm",
+    "sm08": "Lost Thunder",
+    "sm09": "Team Up",
+    "sm10": "Unbroken Bonds",
+    "sm11": "Unified Minds",
+    "sm12": "Cosmic Eclipse",
+    "xy01": "XY",
+    "xy02": "Flashfire",
+    "xy03": "Furious Fists",
+    "xy04": "Phantom Forces",
+    "xy05": "Primal Clash",
+    "xy06": "Roaring Skies",
+    "xy07": "Ancient Origins",
+    "xy08": "BREAKthrough",
+    "xy09": "BREAKpoint",
+    "xy10": "Fates Collide",
+    "xy11": "Steam Siege",
+    "xy12": "Evolutions"
+  }
+}

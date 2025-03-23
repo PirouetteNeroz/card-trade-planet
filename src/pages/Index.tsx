@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, TrendingUp, CheckCircle, Clock } from "lucide-react";
 import { fetchAllSeries } from "@/lib/api";
+import seriesBlocksData from '@/data/seriesBlocks.json';
 
 const Index = () => {
   const [series, setSeries] = useState([]);
@@ -29,6 +30,18 @@ const Index = () => {
         // Handle complex objects that can't be directly rendered
         if (processedItem.cardCount && typeof processedItem.cardCount === 'object') {
           processedItem.cardCountDisplay = `${processedItem.cardCount.official || 0} cartes`;
+        }
+        
+        // Try to find a matching logo URL from our JSON data
+        const seriesBlock = seriesBlocksData.blocks.find(block => 
+          block.series.some((s: any) => s.name === processedItem.name)
+        );
+        
+        if (seriesBlock) {
+          const matchingSeries = seriesBlock.series.find((s: any) => s.name === processedItem.name);
+          if (matchingSeries) {
+            processedItem.logo_url = matchingSeries.logo_url;
+          }
         }
         
         return processedItem;
@@ -144,4 +157,3 @@ const Index = () => {
 };
 
 export default Index;
-
