@@ -135,7 +135,7 @@ export default function FilterPanel({
 
   // Sort options
   const sortOptions = [
-    { value: "", label: "Trier par..." },
+    { value: "default", label: "Trier par..." },
     { value: "name-asc", label: "Nom (A-Z)" },
     { value: "name-desc", label: "Nom (Z-A)" },
     { value: "number-asc", label: "Numéro ↑" },
@@ -151,13 +151,13 @@ export default function FilterPanel({
 
       {/* Sort Section */}
       <div className="mb-6">
-        <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
+        <Select value={sortOption || "default"} onValueChange={(value) => onSortChange(value === "default" ? "" : value as SortOption)}>
           <SelectTrigger className="w-full">
             <SelectValue placeholder="Trier par..." />
           </SelectTrigger>
           <SelectContent>
             {sortOptions.map(option => (
-              <SelectItem key={option.value || "default"} value={option.value}>
+              <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
             ))}
@@ -282,7 +282,7 @@ export default function FilterPanel({
               <SelectValue placeholder="Toutes les séries" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toutes les séries</SelectItem>
+              <SelectItem key="all-series" value="all">Toutes les séries</SelectItem>
               {Object.entries(expansions).map(([id, name]) => (
                 <SelectItem key={id} value={name}>{name}</SelectItem>
               ))}
