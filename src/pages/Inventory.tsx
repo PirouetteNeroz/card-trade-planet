@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -11,15 +12,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
-import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn, formatDate } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+
+// Local storage keys
+const LS_VIEW_MODE = "inventory-view-mode";
+const LS_INVENTORY = "inventory-data";
+const LS_EXPANSIONS = "expansions-data";
 
 export default function Inventory() {
   const [inventory, setInventory] = useState<Card[]>([]);
   const [filteredInventory, setFilteredInventory] = useState<Card[]>([]);
   const [expansions, setExpansions] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list">(() => {
+    const savedMode = localStorage.getItem(LS_VIEW_MODE);
+    return (savedMode as "grid" | "list") || "grid";
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [activeFilters, setActiveFilters] = useState<FilterState>({
@@ -39,18 +49,50 @@ export default function Inventory() {
   const queryParams = new URLSearchParams(location.search);
   const seriesParam = queryParams.get("series");
 
+  // Handle view mode change
+  const handleViewModeChange = (mode: "grid" | "list") => {
+    setViewMode(mode);
+    localStorage.setItem(LS_VIEW_MODE, mode);
+  };
+
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
       
+      // Load cart from local storage
       const savedCart = loadCartFromLocalStorage();
       setCart(savedCart);
       
-      const expansionsData = await fetchExpansions();
-      setExpansions(expansionsData);
+      // Try to load data from localStorage first
+      const cachedExpansions = localStorage.getItem(LS_EXPANSIONS);
+      const cachedInventory = localStorage.getItem(LS_INVENTORY);
       
-      const inventoryData = await fetchInventory();
-      setInventory(inventoryData);
+      let expansionsData: Record<string, string> = {};
+      let inventoryData: Card[] = [];
+      
+      if (cachedExpansions && cachedInventory) {
+        try {
+          expansionsData = JSON.parse(cachedExpansions);
+          inventoryData = JSON.parse(cachedInventory);
+          setExpansions(expansionsData);
+          setInventory(inventoryData);
+        } catch (e) {
+          // If parsing fails, fetch fresh data
+          expansionsData = await fetchExpansions();
+          inventoryData = await fetchInventory();
+        }
+      } else {
+        // If no cached data, fetch fresh data
+        expansionsData = await fetchExpansions();
+        inventoryData = await fetchInventory();
+        
+        // Save to localStorage for future visits
+        localStorage.setItem(LS_EXPANSIONS, JSON.stringify(expansionsData));
+        localStorage.setItem(LS_INVENTORY, JSON.stringify(inventoryData));
+        
+        setExpansions(expansionsData);
+        setInventory(inventoryData);
+      }
       
       if (seriesParam) {
         const seriesName = findSeriesNameById(seriesParam);
@@ -71,7 +113,7 @@ export default function Inventory() {
   useEffect(() => {
     let filtered = [...inventory];
     
-    if (activeFilters.expansion) {
+    if (activeFilters.expansion && activeFilters.expansion !== "all") {
       filtered = filtered.filter(card => card.expansion === activeFilters.expansion);
     }
     
@@ -189,7 +231,7 @@ export default function Inventory() {
     if (activeFilters.cardType) count++;
     if (activeFilters.rarity) count++;
     if (activeFilters.condition) count++;
-    if (activeFilters.expansion) count++;
+    if (activeFilters.expansion && activeFilters.expansion !== "all") count++;
     if (activeFilters.language) count++;
     if (activeFilters.isReverse) count++;
     if (activeFilters.priceRange[0] > 0 || activeFilters.priceRange[1] < 1000) count++;
@@ -257,7 +299,7 @@ export default function Inventory() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setViewMode("grid")}
+                  onClick={() => handleViewModeChange("grid")}
                   className={cn(
                     "rounded-none border-r", 
                     viewMode === "grid" ? "bg-slate-100 dark:bg-slate-800" : ""
@@ -268,7 +310,7 @@ export default function Inventory() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => setViewMode("list")}
+                  onClick={() => handleViewModeChange("list")}
                   className={cn(
                     viewMode === "list" ? "bg-slate-100 dark:bg-slate-800" : ""
                   )}
@@ -307,7 +349,7 @@ export default function Inventory() {
                   Reverse
                 </Badge>
               )}
-              {activeFilters.expansion && (
+              {activeFilters.expansion && activeFilters.expansion !== "all" && (
                 <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200">
                   Extension: {activeFilters.expansion}
                 </Badge>
@@ -326,14 +368,16 @@ export default function Inventory() {
         
         <div className="flex flex-col sm:flex-row">
           <div className="w-full sm:w-72 px-4 sm:px-0 sm:pl-6 flex-shrink-0">
-            <div className="sticky top-24 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700">
-              <FilterPanel 
-                onFilterChange={handleFilterChange} 
-                expansions={expansions} 
-                onSortChange={handleSortChange}
-                currentFilters={activeFilters}
-                sortOption={sortOption}
-              />
+            <div className="sticky top-24 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 max-h-[calc(100vh-150px)]">
+              <ScrollArea className="pr-3 max-h-[calc(100vh-200px)]">
+                <FilterPanel 
+                  onFilterChange={handleFilterChange} 
+                  expansions={expansions} 
+                  onSortChange={handleSortChange}
+                  currentFilters={activeFilters}
+                  sortOption={sortOption}
+                />
+              </ScrollArea>
             </div>
           </div>
           
@@ -360,7 +404,7 @@ export default function Inventory() {
             ) : (
               <>
                 {viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in">
+                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
                     {filteredInventory.map((card) => (
                       <div key={card.id} className="transform transition-all duration-300 hover:scale-[1.02]">
                         <PokemonCard
@@ -394,6 +438,7 @@ export default function Inventory() {
                                 src={card.image_url}
                                 alt={card.name_fr || card.name_en}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-xs text-center p-2">

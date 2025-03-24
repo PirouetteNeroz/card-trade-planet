@@ -275,8 +275,8 @@ export default function FilterPanel({
         </CollapsibleTrigger>
         <CollapsibleContent className="pt-3 pb-1">
           <Select 
-            value={filters.expansion} 
-            onValueChange={(value) => handleFilterChange("expansion", value)}
+            value={filters.expansion || "all"} 
+            onValueChange={(value) => handleFilterChange("expansion", value === "all" ? "" : value)}
           >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Toutes les séries" />
