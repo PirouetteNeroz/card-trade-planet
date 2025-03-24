@@ -142,8 +142,8 @@ export default function PokemonCard({
         </div>
       </div>
       
-      <CardContent className="p-3">
-        <div className="mb-2">
+      <CardContent className="p-4">
+        <div className="mb-3">
           <h3 className="font-medium line-clamp-2 text-base">
             {name_fr || name_en}
           </h3>
@@ -152,23 +152,17 @@ export default function PokemonCard({
               ({name_en})
             </p>
           )}
-          <div className="flex justify-between items-start mt-1">
+          <div className="flex justify-between items-center mt-2">
             <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">
               {expansion}
-              {collectorNumber && (
-                <span className="ml-1 text-xs text-slate-500 whitespace-nowrap">
-                  <Hash className="h-3 w-3 inline mr-0.5" />
-                  {collectorNumber}
-                </span>
-              )}
             </div>
-            <Badge variant="outline" className="text-xs ml-1 whitespace-nowrap">
+            <Badge variant="outline" className="text-xs whitespace-nowrap">
               {condition}
             </Badge>
           </div>
         </div>
         
-        <div className="flex flex-col gap-2 mt-3">
+        <div className="flex flex-col gap-2 mt-3 pt-2 border-t border-slate-200 dark:border-slate-700">
           <div className="flex justify-between items-center">
             <div className="font-bold text-lg text-primary">
               {new Intl.NumberFormat('fr-FR', {

@@ -20,3 +20,15 @@ export function formatDate(dateString: string | Date): string {
     day: 'numeric'
   }).format(date);
 }
+
+/**
+ * Formats a price in EUR currency format
+ * @param price The price to format
+ * @returns Formatted price string
+ */
+export function formatPrice(price: number): string {
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'currency',
+    currency: 'EUR'
+  }).format(price);
+}

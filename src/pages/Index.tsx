@@ -8,16 +8,18 @@ import SeriesCard from "@/components/SeriesCard";
 import { findSeriesIdByName } from "@/lib/api-mapping";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Sparkles, TrendingUp, CheckCircle, Clock } from "lucide-react";
-import { fetchAllSeries } from "@/lib/api";
+import { LayersIcon, TrendingUp, CheckCircle, Clock } from "lucide-react";
+import { fetchAllSeries, fetchInventory } from "@/lib/api";
 import seriesBlocksData from '@/data/seriesBlocks.json';
 
 const Index = () => {
   const [series, setSeries] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [totalCards, setTotalCards] = useState(0);
 
   useEffect(() => {
     fetchSeriesData();
+    fetchCardCount();
   }, []);
 
   async function fetchSeriesData() {
@@ -61,6 +63,24 @@ const Index = () => {
     }
   }
 
+  async function fetchCardCount() {
+    try {
+      // Try to get cached inventory from localStorage first
+      const cachedInventory = localStorage.getItem("inventory-data");
+      
+      if (cachedInventory) {
+        const inventoryData = JSON.parse(cachedInventory);
+        setTotalCards(inventoryData.length);
+      } else {
+        const inventoryData = await fetchInventory();
+        setTotalCards(inventoryData.length);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du compteur de cartes:', error);
+      setTotalCards(0);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-slate-50 dark:from-background dark:to-slate-900/50">
       <Navbar />
@@ -82,9 +102,9 @@ const Index = () => {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card className="hover-scale">
                 <CardContent className="p-6 flex flex-col items-center text-center">
-                  <Sparkles className="h-10 w-10 text-amber-500 mb-4" />
-                  <h3 className="text-lg font-medium mb-2">Cartes Rares</h3>
-                  <p className="text-muted-foreground">Des cartes exclusives et difficiles à trouver</p>
+                  <LayersIcon className="h-10 w-10 text-amber-500 mb-4" />
+                  <h3 className="text-lg font-medium mb-2">Collection</h3>
+                  <p className="text-muted-foreground">{totalCards} cartes disponibles dans notre inventaire</p>
                 </CardContent>
               </Card>
               

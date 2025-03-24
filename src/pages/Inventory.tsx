@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -375,7 +376,7 @@ export default function Inventory() {
                   <h2 className="font-semibold text-lg">Filtres</h2>
                 </div>
               </div>
-              <ScrollArea className="h-[calc(100%-60px)] pr-3 pb-4">
+              <ScrollArea className="h-[calc(100%-60px)] pr-3">
                 <div className="p-4">
                   <FilterPanel 
                     onFilterChange={handleFilterChange} 
@@ -415,7 +416,7 @@ export default function Inventory() {
               ) : (
                 <>
                   {viewMode === "grid" ? (
-                    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 animate-fade-in">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5 sm:gap-6 animate-fade-in">
                       {filteredInventory.map((card) => (
                         <div key={card.id} className="h-full transform transition-all duration-300 hover:scale-[1.02]">
                           <PokemonCard
