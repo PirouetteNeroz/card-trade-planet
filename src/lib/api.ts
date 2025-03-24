@@ -43,6 +43,9 @@ export interface Order {
   createdAt: Date;
 }
 
+// Cache pour les noms français des séries
+let frenchSeriesNames: Record<string, string> = {};
+
 // Fetch all Pokémon card series
 export async function fetchAllSeries(): Promise<Series[]> {
   try {
@@ -53,6 +56,68 @@ export async function fetchAllSeries(): Promise<Series[]> {
     console.error('Erreur:', error);
     return [];
   }
+}
+
+// Fetch French series names from tcgdex
+export async function fetchFrenchSeriesNames(): Promise<Record<string, string>> {
+  if (Object.keys(frenchSeriesNames).length > 0) {
+    return frenchSeriesNames;
+  }
+  
+  try {
+    const response = await fetch('https://api.tcgdex.net/v2/fr/sets');
+    if (!response.ok) throw new Error('Impossible de récupérer les séries françaises');
+    
+    const seriesData = await response.json();
+    const mapping: Record<string, string> = {};
+    
+    // Créer un mapping entre noms anglais et français
+    seriesData.forEach((series: any) => {
+      // Normaliser les noms pour la correspondance
+      const englishName = series.name.replace(/&/g, '').trim();
+      
+      // Extraire l'identifiant du set basé sur le format (ex: sv01, swsh01)
+      const setId = series.id.toLowerCase();
+      
+      if (series.name && series.localName) {
+        mapping[englishName] = series.localName;
+        
+        // Aussi stocker par ID quand disponible
+        if (setId) {
+          mapping[setId] = series.localName;
+        }
+      }
+    });
+    
+    frenchSeriesNames = mapping;
+    return mapping;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des noms français:", error);
+    return {};
+  }
+}
+
+// Traduire un nom de série en français
+export async function getSeriesFrenchName(englishName: string): Promise<string> {
+  const frenchNames = await fetchFrenchSeriesNames();
+  
+  // Nettoyer le nom pour la correspondance
+  const cleanName = englishName.replace(/&/g, '').trim();
+  
+  // Recherche directe
+  if (frenchNames[cleanName]) {
+    return frenchNames[cleanName];
+  }
+  
+  // Recherche par correspondance partielle si la recherche directe échoue
+  for (const [key, value] of Object.entries(frenchNames)) {
+    if (cleanName.toLowerCase().includes(key.toLowerCase()) || 
+        key.toLowerCase().includes(cleanName.toLowerCase())) {
+      return value;
+    }
+  }
+  
+  return englishName; // Retourner le nom original si aucune traduction trouvée
 }
 
 // Fetch expansions from CardTrader API
@@ -67,10 +132,13 @@ export async function fetchExpansions(): Promise<Record<string, string>> {
     
     const data = await response.json();
     const expansionMap: Record<string, string> = {};
+    const frenchNames = await fetchFrenchSeriesNames();
     
-    data.forEach((exp: any) => {
-      expansionMap[exp.id] = exp.name;
-    });
+    for (const exp of data) {
+      // Essayer de trouver la traduction française
+      const frenchName = await getSeriesFrenchName(exp.name);
+      expansionMap[exp.id] = frenchName || exp.name;
+    }
     
     return expansionMap;
   } catch (error) {
@@ -94,11 +162,28 @@ export async function fetchInventory(): Promise<Card[]> {
     // Fetch expansions map first
     const expansionsMap = await fetchExpansions();
     
+    // Charger les informations des séries pour obtenir les comptes de cartes
+    let seriesInfo: Record<string, any> = {};
+    try {
+      const tcgdexResponse = await fetch('https://api.tcgdex.net/v2/fr/sets');
+      if (tcgdexResponse.ok) {
+        const seriesData = await tcgdexResponse.json();
+        seriesData.forEach((series: any) => {
+          seriesInfo[series.id.toLowerCase()] = {
+            cardCount: series.cardCount?.total || 0,
+            releaseDate: series.releaseDate
+          };
+        });
+      }
+    } catch (e) {
+      console.error("Erreur lors du chargement des informations de série:", e);
+    }
+    
     return await Promise.all(data.map(async (card: any) => {
       const frenchName = await fetchFrenchPokemonName(card.name_en.toLowerCase());
       
-      // Use expansion name from the map or fallback to ID
-      const expansionName = expansionsMap[card.expansion.id] || card.expansion.id;
+      // Utiliser le nom français de l'extension s'il est disponible
+      let expansionName = expansionsMap[card.expansion.id] || card.expansion.id;
       
       return {
         id: card.id,

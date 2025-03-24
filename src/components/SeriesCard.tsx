@@ -1,10 +1,11 @@
 
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, FileText } from "lucide-react";
 import { formatDate } from "@/lib/utils";
-import { findSeriesIdByName } from "@/lib/api-mapping";
+import { findSeriesIdByName, getSeriesInfo } from "@/lib/api-mapping";
 
 interface SeriesCardProps {
   serie: any;
@@ -14,6 +15,20 @@ interface SeriesCardProps {
 export default function SeriesCard({ serie, compact = false }: SeriesCardProps) {
   // Get the series ID for linking to inventory
   const seriesId = serie.tcgdex_id || findSeriesIdByName(serie.name);
+  const [cardCount, setCardCount] = useState<number | undefined>(undefined);
+  
+  useEffect(() => {
+    const fetchSeriesInfo = async () => {
+      if (seriesId) {
+        const info = await getSeriesInfo(seriesId);
+        if (info.cardCount) {
+          setCardCount(info.cardCount);
+        }
+      }
+    };
+    
+    fetchSeriesInfo();
+  }, [seriesId]);
   
   return (
     <Link to={seriesId ? `/inventory?series=${seriesId}` : "/inventory"}>
@@ -41,10 +56,10 @@ export default function SeriesCard({ serie, compact = false }: SeriesCardProps) 
           
           {!compact && (
             <div className="flex flex-wrap gap-2 mt-2">
-              {serie.cardCountDisplay && (
+              {(cardCount || serie.cardCountDisplay) && (
                 <Badge variant="outline" className="text-xs flex items-center gap-1">
                   <FileText className="h-3 w-3" />
-                  {serie.cardCountDisplay}
+                  {cardCount ? `${cardCount} cartes` : serie.cardCountDisplay}
                 </Badge>
               )}
               

@@ -22,6 +22,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger
 } from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export interface FilterState {
   cardType: string;
@@ -143,191 +144,193 @@ export default function FilterPanel({
   ];
 
   return (
-    <div className="space-y-6">
-      {/* Sort Section */}
-      <div className="mb-6">
-        <Select value={sortOption || "default"} onValueChange={(value) => onSortChange(value === "default" ? "" : value as SortOption)}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Trier par..." />
-          </SelectTrigger>
-          <SelectContent>
-            {sortOptions.map(option => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Card Type Section */}
-      <Collapsible open={openSections.cardType} onOpenChange={() => toggleSection("cardType")}>
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-            <Label className="font-medium">Type de carte</Label>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.cardType ? "transform rotate-180" : ""}`} />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-3 pb-1">
-          <Select 
-            value={filters.cardType || "all"} 
-            onValueChange={(value) => handleFilterChange("cardType", value === "all" ? "" : value)}
-          >
+    <ScrollArea className="h-full pr-4">
+      <div className="space-y-6">
+        {/* Sort Section */}
+        <div className="mb-6">
+          <Select value={sortOption || "default"} onValueChange={(value) => onSortChange(value === "default" ? "" : value as SortOption)}>
             <SelectTrigger className="w-full">
-              <SelectValue placeholder="Tous les types" />
+              <SelectValue placeholder="Trier par..." />
             </SelectTrigger>
             <SelectContent>
-              {cardTypes.map(type => (
-                <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+              {sortOptions.map(option => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        </CollapsibleContent>
-      </Collapsible>
+        </div>
 
-      {/* Rarity Section */}
-      <Collapsible open={openSections.rarity} onOpenChange={() => toggleSection("rarity")}>
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-            <Label className="font-medium">Rareté</Label>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.rarity ? "transform rotate-180" : ""}`} />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-3 pb-1">
-          <Select 
-            value={filters.rarity || "all"} 
-            onValueChange={(value) => handleFilterChange("rarity", value === "all" ? "" : value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Toutes les raretés" />
-            </SelectTrigger>
-            <SelectContent>
-              {rarities.map(rarity => (
-                <SelectItem key={rarity.value} value={rarity.value}>{rarity.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Condition Section */}
-      <Collapsible open={openSections.condition} onOpenChange={() => toggleSection("condition")}>
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-            <Label className="font-medium">État</Label>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.condition ? "transform rotate-180" : ""}`} />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-3 pb-1">
-          <Select 
-            value={filters.condition || "all"} 
-            onValueChange={(value) => handleFilterChange("condition", value === "all" ? "" : value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Tous les états" />
-            </SelectTrigger>
-            <SelectContent>
-              {conditions.map(condition => (
-                <SelectItem key={condition.value} value={condition.value}>{condition.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Language Section */}
-      <Collapsible open={openSections.language} onOpenChange={() => toggleSection("language")}>
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-            <Label className="font-medium">Langue</Label>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.language ? "transform rotate-180" : ""}`} />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-3 pb-1">
-          <Select 
-            value={filters.language || "all"} 
-            onValueChange={(value) => handleFilterChange("language", value === "all" ? "" : value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Toutes les langues" />
-            </SelectTrigger>
-            <SelectContent>
-              {languages.map(language => (
-                <SelectItem key={language.value} value={language.value}>{language.label}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Expansion Section */}
-      <Collapsible open={openSections.expansion} onOpenChange={() => toggleSection("expansion")}>
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-            <Label className="font-medium">Série</Label>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.expansion ? "transform rotate-180" : ""}`} />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-3 pb-1">
-          <Select 
-            value={filters.expansion || "all"} 
-            onValueChange={(value) => handleFilterChange("expansion", value === "all" ? "" : value)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Toutes les séries" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem key="all-series" value="all">Toutes les séries</SelectItem>
-              {Object.entries(expansions).map(([id, name]) => (
-                <SelectItem key={id} value={name}>{name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Price Range Section */}
-      <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
-        <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-            <Label className="font-medium">Prix</Label>
-            <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? "transform rotate-180" : ""}`} />
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4 pb-1">
-          <div className="space-y-4">
-            <div className="flex justify-between">
-              <span className="text-sm text-slate-600 dark:text-slate-400">
-                {filters.priceRange[0]}€
-              </span>
-              <span className="text-sm text-slate-600 dark:text-slate-400">
-                {filters.priceRange[1]}€
-              </span>
+        {/* Card Type Section */}
+        <Collapsible open={openSections.cardType} onOpenChange={() => toggleSection("cardType")}>
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+              <Label className="font-medium">Type de carte</Label>
+              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.cardType ? "transform rotate-180" : ""}`} />
             </div>
-            <Slider
-              defaultValue={[0, 1000]}
-              value={[filters.priceRange[0], filters.priceRange[1]]}
-              onValueChange={handlePriceChange}
-              max={1000}
-              step={10}
-              className="my-6"
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-3 pb-1">
+            <Select 
+              value={filters.cardType || "all"} 
+              onValueChange={(value) => handleFilterChange("cardType", value === "all" ? "" : value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Tous les types" />
+              </SelectTrigger>
+              <SelectContent>
+                {cardTypes.map(type => (
+                  <SelectItem key={type.value} value={type.value}>{type.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CollapsibleContent>
+        </Collapsible>
 
-      {/* Reverse Holo Switch */}
-      <div className="flex items-center space-x-2 mt-2 py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
-        <Switch
-          id="reverse"
-          checked={filters.isReverse}
-          onCheckedChange={(checked) => handleFilterChange("isReverse", checked)}
-        />
-        <Label htmlFor="reverse" className="flex items-center gap-1 cursor-pointer">
-          <Sparkles className="h-4 w-4 text-purple-500" />
-          Reverse Holo
-        </Label>
+        {/* Rarity Section */}
+        <Collapsible open={openSections.rarity} onOpenChange={() => toggleSection("rarity")}>
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+              <Label className="font-medium">Rareté</Label>
+              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.rarity ? "transform rotate-180" : ""}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-3 pb-1">
+            <Select 
+              value={filters.rarity || "all"} 
+              onValueChange={(value) => handleFilterChange("rarity", value === "all" ? "" : value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Toutes les raretés" />
+              </SelectTrigger>
+              <SelectContent>
+                {rarities.map(rarity => (
+                  <SelectItem key={rarity.value} value={rarity.value}>{rarity.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Condition Section */}
+        <Collapsible open={openSections.condition} onOpenChange={() => toggleSection("condition")}>
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+              <Label className="font-medium">État</Label>
+              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.condition ? "transform rotate-180" : ""}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-3 pb-1">
+            <Select 
+              value={filters.condition || "all"} 
+              onValueChange={(value) => handleFilterChange("condition", value === "all" ? "" : value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Tous les états" />
+              </SelectTrigger>
+              <SelectContent>
+                {conditions.map(condition => (
+                  <SelectItem key={condition.value} value={condition.value}>{condition.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Language Section */}
+        <Collapsible open={openSections.language} onOpenChange={() => toggleSection("language")}>
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+              <Label className="font-medium">Langue</Label>
+              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.language ? "transform rotate-180" : ""}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-3 pb-1">
+            <Select 
+              value={filters.language || "all"} 
+              onValueChange={(value) => handleFilterChange("language", value === "all" ? "" : value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Toutes les langues" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map(language => (
+                  <SelectItem key={language.value} value={language.value}>{language.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Expansion Section */}
+        <Collapsible open={openSections.expansion} onOpenChange={() => toggleSection("expansion")}>
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+              <Label className="font-medium">Série</Label>
+              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.expansion ? "transform rotate-180" : ""}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-3 pb-1">
+            <Select 
+              value={filters.expansion || "all"} 
+              onValueChange={(value) => handleFilterChange("expansion", value === "all" ? "" : value)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Toutes les séries" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem key="all-series" value="all">Toutes les séries</SelectItem>
+                {Object.entries(expansions).map(([id, name]) => (
+                  <SelectItem key={id} value={name}>{name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Price Range Section */}
+        <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
+          <CollapsibleTrigger asChild>
+            <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+              <Label className="font-medium">Prix</Label>
+              <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? "transform rotate-180" : ""}`} />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 pb-1">
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-sm text-slate-600 dark:text-slate-400">
+                  {filters.priceRange[0]}€
+                </span>
+                <span className="text-sm text-slate-600 dark:text-slate-400">
+                  {filters.priceRange[1]}€
+                </span>
+              </div>
+              <Slider
+                defaultValue={[0, 1000]}
+                value={[filters.priceRange[0], filters.priceRange[1]]}
+                onValueChange={handlePriceChange}
+                max={1000}
+                step={10}
+                className="my-6"
+              />
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Reverse Holo Switch */}
+        <div className="flex items-center space-x-2 mt-2 py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
+          <Switch
+            id="reverse"
+            checked={filters.isReverse}
+            onCheckedChange={(checked) => handleFilterChange("isReverse", checked)}
+          />
+          <Label htmlFor="reverse" className="flex items-center gap-1 cursor-pointer">
+            <Sparkles className="h-4 w-4 text-purple-500" />
+            Reverse Holo
+          </Label>
+        </div>
       </div>
-    </div>
+    </ScrollArea>
   );
 }

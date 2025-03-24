@@ -1,5 +1,6 @@
 
 import seriesBlocksData from '@/data/seriesBlocks.json';
+import { getSeriesFrenchName } from './api';
 
 /**
  * Trouve l'ID d'une série à partir de son nom
@@ -32,6 +33,37 @@ export function findSeriesIdByName(seriesName: string): string | undefined {
  * @param seriesId - L'ID de la série à rechercher
  * @returns Le nom de la série ou undefined si non trouvé
  */
-export function findSeriesNameById(seriesId: string): string | undefined {
-  return seriesBlocksData.seriesMapping[seriesId];
+export async function findSeriesNameById(seriesId: string): Promise<string | undefined> {
+  const englishName = seriesBlocksData.seriesMapping[seriesId];
+  if (!englishName) return undefined;
+  
+  try {
+    // Tenter de trouver le nom français
+    const frenchName = await getSeriesFrenchName(englishName);
+    return frenchName || englishName;
+  } catch (error) {
+    console.error("Erreur lors de la traduction du nom de série:", error);
+    return englishName;
+  }
+}
+
+/**
+ * Obtient les informations de série depuis TCGdex
+ * @param seriesId - L'ID de la série
+ * @returns Informations sur la série incluant le nombre de cartes
+ */
+export async function getSeriesInfo(seriesId: string): Promise<{cardCount?: number, releaseDate?: string}> {
+  try {
+    const response = await fetch(`https://api.tcgdex.net/v2/fr/sets/${seriesId}`);
+    if (!response.ok) return {};
+    
+    const data = await response.json();
+    return {
+      cardCount: data.cardCount?.total || 0,
+      releaseDate: data.releaseDate
+    };
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des infos pour ${seriesId}:`, error);
+    return {};
+  }
 }

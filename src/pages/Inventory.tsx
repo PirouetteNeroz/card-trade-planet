@@ -1,10 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import PokemonCard from "@/components/PokemonCard";
 import FilterPanel, { FilterState, SortOption } from "@/components/FilterPanel";
-import { Card, CartItem, fetchInventory, fetchExpansions, saveCartToLocalStorage, loadCartFromLocalStorage } from "@/lib/api";
+import { Card, CartItem, fetchInventory, fetchExpansions, saveCartToLocalStorage, loadCartFromLocalStorage, getSeriesFrenchName } from "@/lib/api";
 import { findSeriesNameById } from "@/lib/api-mapping";
 import { useToast } from "@/components/ui/use-toast";
 import { Grid, List, Loader2, LayoutGrid, Filter, Search, Sparkles, Languages, Hash, SlidersHorizontal } from "lucide-react";
@@ -13,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatDate, formatPrice } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
@@ -96,12 +95,16 @@ export default function Inventory() {
       }
       
       if (seriesParam) {
-        const seriesName = findSeriesNameById(seriesParam);
-        if (seriesName) {
-          setActiveFilters({
-            ...activeFilters,
-            expansion: seriesName
-          });
+        try {
+          const seriesName = await findSeriesNameById(seriesParam);
+          if (seriesName) {
+            setActiveFilters({
+              ...activeFilters,
+              expansion: seriesName
+            });
+          }
+        } catch (error) {
+          console.error("Erreur lors de la recherche du nom de série:", error);
         }
       }
       
@@ -504,10 +507,7 @@ export default function Inventory() {
                                 
                                 <div className="text-right">
                                   <div className="font-bold text-slate-800 dark:text-slate-100">
-                                    {new Intl.NumberFormat('fr-FR', {
-                                      style: 'currency',
-                                      currency: 'EUR'
-                                    }).format(card.price)}
+                                    {formatPrice(card.price)}
                                   </div>
                                   <div className="text-sm text-slate-600 dark:text-slate-400">
                                     Stock: {card.quantity}
