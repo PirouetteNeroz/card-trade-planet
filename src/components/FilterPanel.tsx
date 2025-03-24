@@ -144,11 +144,6 @@ export default function FilterPanel({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Filter className="h-5 w-5 text-primary" />
-        <h2 className="font-semibold text-lg">Filtres</h2>
-      </div>
-
       {/* Sort Section */}
       <div className="mb-6">
         <Select value={sortOption || "default"} onValueChange={(value) => onSortChange(value === "default" ? "" : value as SortOption)}>
@@ -168,7 +163,7 @@ export default function FilterPanel({
       {/* Card Type Section */}
       <Collapsible open={openSections.cardType} onOpenChange={() => toggleSection("cardType")}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
             <Label className="font-medium">Type de carte</Label>
             <ChevronDown className={`h-4 w-4 transition-transform ${openSections.cardType ? "transform rotate-180" : ""}`} />
           </div>
@@ -193,7 +188,7 @@ export default function FilterPanel({
       {/* Rarity Section */}
       <Collapsible open={openSections.rarity} onOpenChange={() => toggleSection("rarity")}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
             <Label className="font-medium">Rareté</Label>
             <ChevronDown className={`h-4 w-4 transition-transform ${openSections.rarity ? "transform rotate-180" : ""}`} />
           </div>
@@ -218,7 +213,7 @@ export default function FilterPanel({
       {/* Condition Section */}
       <Collapsible open={openSections.condition} onOpenChange={() => toggleSection("condition")}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
             <Label className="font-medium">État</Label>
             <ChevronDown className={`h-4 w-4 transition-transform ${openSections.condition ? "transform rotate-180" : ""}`} />
           </div>
@@ -243,7 +238,7 @@ export default function FilterPanel({
       {/* Language Section */}
       <Collapsible open={openSections.language} onOpenChange={() => toggleSection("language")}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
             <Label className="font-medium">Langue</Label>
             <ChevronDown className={`h-4 w-4 transition-transform ${openSections.language ? "transform rotate-180" : ""}`} />
           </div>
@@ -268,7 +263,7 @@ export default function FilterPanel({
       {/* Expansion Section */}
       <Collapsible open={openSections.expansion} onOpenChange={() => toggleSection("expansion")}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
             <Label className="font-medium">Série</Label>
             <ChevronDown className={`h-4 w-4 transition-transform ${openSections.expansion ? "transform rotate-180" : ""}`} />
           </div>
@@ -294,7 +289,7 @@ export default function FilterPanel({
       {/* Price Range Section */}
       <Collapsible open={openSections.price} onOpenChange={() => toggleSection("price")}>
         <CollapsibleTrigger asChild>
-          <div className="flex items-center justify-between cursor-pointer py-1 border-b dark:border-slate-700">
+          <div className="flex items-center justify-between cursor-pointer py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
             <Label className="font-medium">Prix</Label>
             <ChevronDown className={`h-4 w-4 transition-transform ${openSections.price ? "transform rotate-180" : ""}`} />
           </div>
@@ -322,7 +317,7 @@ export default function FilterPanel({
       </Collapsible>
 
       {/* Reverse Holo Switch */}
-      <div className="flex items-center space-x-2 mt-2">
+      <div className="flex items-center space-x-2 mt-2 py-2 px-2 rounded-md hover:bg-slate-100 dark:hover:bg-slate-700/30">
         <Switch
           id="reverse"
           checked={filters.isReverse}

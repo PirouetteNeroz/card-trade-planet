@@ -89,7 +89,7 @@ export default function PokemonCard({
 
   return (
     <Card className={cn(
-      "overflow-hidden transition-all duration-300 hover:shadow-md group",
+      "overflow-hidden transition-all duration-300 hover:shadow-lg group h-full",
       isReverse ? "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700" : ""
     )}>
       <div className="relative aspect-[2/3] bg-slate-200 dark:bg-slate-700 overflow-hidden">
@@ -144,73 +144,69 @@ export default function PokemonCard({
       
       <CardContent className="p-3">
         <div className="mb-2">
-          <h3 className="font-medium line-clamp-1 text-base">
+          <h3 className="font-medium line-clamp-2 text-base">
             {name_fr || name_en}
-            {collectorNumber && (
-              <span className="ml-2 text-sm text-slate-500">
-                <Hash className="h-3 w-3 inline mr-1" />
-                {collectorNumber}
-              </span>
-            )}
           </h3>
           {name_fr && name_en && name_fr !== name_en && (
             <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
               ({name_en})
             </p>
           )}
-          <div className="text-sm text-slate-500 dark:text-slate-400 font-medium mt-1">
-            {expansion}
+          <div className="flex justify-between items-start mt-1">
+            <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">
+              {expansion}
+              {collectorNumber && (
+                <span className="ml-1 text-xs text-slate-500 whitespace-nowrap">
+                  <Hash className="h-3 w-3 inline mr-0.5" />
+                  {collectorNumber}
+                </span>
+              )}
+            </div>
+            <Badge variant="outline" className="text-xs ml-1 whitespace-nowrap">
+              {condition}
+            </Badge>
           </div>
         </div>
         
-        <div className="flex items-center justify-between">
-          <Badge variant="outline" className="text-xs">
-            {condition}
-          </Badge>
-          
-          <div className="text-right">
-            <div className="font-bold mb-2">
+        <div className="flex flex-col gap-2 mt-3">
+          <div className="flex justify-between items-center">
+            <div className="font-bold text-lg text-primary">
               {new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
                 currency: 'EUR'
               }).format(price)}
             </div>
-            
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center justify-end">
-                <Badge variant="outline" className="mr-2">
-                  Stock: {quantity}
-                </Badge>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <div className="flex items-center border rounded">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 p-0"
-                    onClick={decrementQuantity}
-                    disabled={cartQuantity <= 1}
-                  >
-                    <Minus className="h-3 w-3" />
-                  </Button>
-                  <span className="w-6 text-center text-sm">{cartQuantity}</span>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 p-0"
-                    onClick={incrementQuantity}
-                    disabled={cartQuantity >= quantity}
-                  >
-                    <Plus className="h-3 w-3" />
-                  </Button>
-                </div>
-                
-                <Button size="sm" onClick={handleAddToCart}>
-                  Ajouter
-                </Button>
-              </div>
+            <Badge variant="outline" className="text-xs">
+              Stock: {quantity}
+            </Badge>
+          </div>
+          
+          <div className="flex gap-2 mt-1">
+            <div className="flex items-center border rounded flex-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 p-0"
+                onClick={decrementQuantity}
+                disabled={cartQuantity <= 1}
+              >
+                <Minus className="h-3 w-3" />
+              </Button>
+              <span className="flex-1 text-center text-sm">{cartQuantity}</span>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 p-0"
+                onClick={incrementQuantity}
+                disabled={cartQuantity >= quantity}
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
             </div>
+            
+            <Button className="flex-1 bg-blue-600 hover:bg-blue-700" onClick={handleAddToCart}>
+              Ajouter
+            </Button>
           </div>
         </div>
       </CardContent>

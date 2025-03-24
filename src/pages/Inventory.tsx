@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "@/components/Navbar";
@@ -15,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn, formatDate } from "@/lib/utils";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 // Local storage keys
 const LS_VIEW_MODE = "inventory-view-mode";
@@ -265,8 +265,8 @@ export default function Inventory() {
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900 page-transition">
       <Navbar />
       
-      <main className="pt-24 pb-16 max-w-7xl mx-auto">
-        <div className="px-4 sm:px-6 lg:px-8 mb-8">
+      <main className="pt-20 pb-16 max-w-[1400px] mx-auto">
+        <div className="px-4 sm:px-6 lg:px-8 mb-6">
           <h1 className="text-3xl font-bold mb-2 text-slate-800 dark:text-slate-100">Inventaire</h1>
           <p className="text-slate-600 dark:text-slate-400">
             {filteredInventory.length} cartes disponibles
@@ -366,160 +366,172 @@ export default function Inventory() {
           )}
         </div>
         
-        <div className="flex flex-col sm:flex-row">
-          <div className="w-full sm:w-72 px-4 sm:px-0 sm:pl-6 flex-shrink-0">
-            <div className="sticky top-24 bg-white dark:bg-slate-800 p-4 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 max-h-[calc(100vh-150px)]">
-              <ScrollArea className="pr-3 max-h-[calc(100vh-200px)]">
-                <FilterPanel 
-                  onFilterChange={handleFilterChange} 
-                  expansions={expansions} 
-                  onSortChange={handleSortChange}
-                  currentFilters={activeFilters}
-                  sortOption={sortOption}
-                />
+        <ResizablePanelGroup direction="horizontal" className="min-h-[600px]">
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30} className="px-4 sm:px-0 sm:pl-6">
+            <div className="sticky top-24 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 h-[calc(100vh-150px)] overflow-hidden">
+              <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-5 w-5 text-primary" />
+                  <h2 className="font-semibold text-lg">Filtres</h2>
+                </div>
+              </div>
+              <ScrollArea className="h-[calc(100%-60px)] pr-3 pb-4">
+                <div className="p-4">
+                  <FilterPanel 
+                    onFilterChange={handleFilterChange} 
+                    expansions={expansions} 
+                    onSortChange={handleSortChange}
+                    currentFilters={activeFilters}
+                    sortOption={sortOption}
+                  />
+                </div>
               </ScrollArea>
             </div>
-          </div>
+          </ResizablePanel>
           
-          <div className="flex-grow px-4 sm:px-6 mt-6 sm:mt-0">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-64 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
-                <div className="flex flex-col items-center">
-                  <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
-                  <p className="text-slate-600 dark:text-slate-400">Chargement de l'inventaire...</p>
-                </div>
-              </div>
-            ) : filteredInventory.length === 0 ? (
-              <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <div className="max-w-md mx-auto">
-                  <h3 className="text-lg font-medium mb-2 text-slate-800 dark:text-slate-200">Aucune carte trouvée</h3>
-                  <p className="text-slate-500 dark:text-slate-400 mb-4">
-                    Essayez de modifier vos filtres ou votre recherche.
-                  </p>
-                  <Button onClick={resetAllFilters} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
-                    Réinitialiser les filtres
-                  </Button>
-                </div>
-              </div>
-            ) : (
-              <>
-                {viewMode === "grid" ? (
-                  <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 animate-fade-in">
-                    {filteredInventory.map((card) => (
-                      <div key={card.id} className="transform transition-all duration-300 hover:scale-[1.02]">
-                        <PokemonCard
-                          id={card.id}
-                          name_en={card.name_en}
-                          name_fr={card.name_fr}
-                          price={card.price}
-                          image_url={card.image_url}
-                          condition={card.condition}
-                          expansion={card.expansion}
-                          expansion_id={card.expansion_id}
-                          rarity={card.rarity}
-                          blueprint_id={card.blueprint_id}
-                          quantity={card.quantity}
-                          collectorNumber={card.collectorNumber}
-                          language={card.language}
-                          isReverse={card.isReverse}
-                          addToCart={handleAddToCart}
-                        />
-                      </div>
-                    ))}
+          <ResizableHandle withHandle />
+          
+          <ResizablePanel defaultSize={80}>
+            <div className="px-4 sm:px-6 pt-2">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-64 bg-white dark:bg-slate-800 rounded-xl shadow-sm">
+                  <div className="flex flex-col items-center">
+                    <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+                    <p className="text-slate-600 dark:text-slate-400">Chargement de l'inventaire...</p>
                   </div>
-                ) : (
-                  <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden border border-slate-200 dark:border-slate-700">
-                    {filteredInventory.map((card, index) => (
-                      <div key={card.id}>
-                        <div className="flex p-4 animate-fade-in hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-200">
-                          <div className="w-20 h-28 flex-shrink-0 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden mr-4 relative">
-                            {card.image_url ? (
-                              <img
-                                src={card.image_url}
-                                alt={card.name_fr || card.name_en}
-                                className="w-full h-full object-cover"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-xs text-center p-2">
-                                {card.name_fr || card.name_en}
-                              </div>
-                            )}
-                            {card.isReverse && (
-                              <Badge className="absolute top-1 right-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-1">
-                                <Sparkles className="h-2 w-2" />
-                              </Badge>
-                            )}
-                          </div>
-                          
-                          <div className="flex-grow">
-                            <div className="flex justify-between">
-                              <div>
-                                <h3 className="font-medium line-clamp-1 text-slate-800 dark:text-slate-200">
+                </div>
+              ) : filteredInventory.length === 0 ? (
+                <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
+                  <div className="max-w-md mx-auto">
+                    <h3 className="text-lg font-medium mb-2 text-slate-800 dark:text-slate-200">Aucune carte trouvée</h3>
+                    <p className="text-slate-500 dark:text-slate-400 mb-4">
+                      Essayez de modifier vos filtres ou votre recherche.
+                    </p>
+                    <Button onClick={resetAllFilters} className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700">
+                      Réinitialiser les filtres
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {viewMode === "grid" ? (
+                    <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 animate-fade-in">
+                      {filteredInventory.map((card) => (
+                        <div key={card.id} className="h-full transform transition-all duration-300 hover:scale-[1.02]">
+                          <PokemonCard
+                            id={card.id}
+                            name_en={card.name_en}
+                            name_fr={card.name_fr}
+                            price={card.price}
+                            image_url={card.image_url}
+                            condition={card.condition}
+                            expansion={card.expansion}
+                            expansion_id={card.expansion_id}
+                            rarity={card.rarity}
+                            blueprint_id={card.blueprint_id}
+                            quantity={card.quantity}
+                            collectorNumber={card.collectorNumber}
+                            language={card.language}
+                            isReverse={card.isReverse}
+                            addToCart={handleAddToCart}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden border border-slate-200 dark:border-slate-700">
+                      {filteredInventory.map((card, index) => (
+                        <div key={card.id}>
+                          <div className="flex p-4 animate-fade-in hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-200">
+                            <div className="w-20 h-28 flex-shrink-0 bg-slate-100 dark:bg-slate-700 rounded overflow-hidden mr-4 relative">
+                              {card.image_url ? (
+                                <img
+                                  src={card.image_url}
+                                  alt={card.name_fr || card.name_en}
+                                  className="w-full h-full object-cover"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="w-full h-full flex items-center justify-center text-xs text-center p-2">
                                   {card.name_fr || card.name_en}
-                                  {card.collectorNumber && (
-                                    <span className="ml-2 text-sm text-slate-500">
-                                      <Hash className="h-3 w-3 inline mr-1" />
-                                      {card.collectorNumber}
-                                    </span>
+                                </div>
+                              )}
+                              {card.isReverse && (
+                                <Badge className="absolute top-1 right-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white p-1">
+                                  <Sparkles className="h-2 w-2" />
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            <div className="flex-grow">
+                              <div className="flex justify-between">
+                                <div>
+                                  <h3 className="font-medium line-clamp-1 text-slate-800 dark:text-slate-200">
+                                    {card.name_fr || card.name_en}
+                                    {card.collectorNumber && (
+                                      <span className="ml-2 text-sm text-slate-500">
+                                        <Hash className="h-3 w-3 inline mr-1" />
+                                        {card.collectorNumber}
+                                      </span>
+                                    )}
+                                  </h3>
+                                  {card.name_fr && card.name_en && card.name_fr !== card.name_en && (
+                                    <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
+                                      ({card.name_en})
+                                    </p>
                                   )}
-                                </h3>
-                                {card.name_fr && card.name_en && card.name_fr !== card.name_en && (
-                                  <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1">
-                                    ({card.name_en})
-                                  </p>
-                                )}
-                                <div className="flex flex-wrap gap-2 mt-1">
-                                  <Badge variant="outline" className="text-xs border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300">
-                                    {card.expansion}
-                                  </Badge>
-                                  <Badge variant="outline" className="text-xs border-green-300 text-green-700 dark:border-green-700 dark:text-green-300">
-                                    {card.condition}
-                                  </Badge>
-                                  
-                                  {card.rarity && (
-                                    <Badge variant="outline" className="text-xs border-purple-300 text-purple-700 dark:border-purple-700 dark:text-purple-300">
-                                      {card.rarity}
+                                  <div className="flex flex-wrap gap-2 mt-1">
+                                    <Badge variant="outline" className="text-xs border-amber-300 text-amber-700 dark:border-amber-700 dark:text-amber-300">
+                                      {card.expansion}
                                     </Badge>
-                                  )}
-                                  
-                                  <Badge variant="outline" className="text-xs border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300">
-                                    <Languages className="h-3 w-3 mr-1" />
-                                    {getLanguageLabel(card.language)}
-                                  </Badge>
+                                    <Badge variant="outline" className="text-xs border-green-300 text-green-700 dark:border-green-700 dark:text-green-300">
+                                      {card.condition}
+                                    </Badge>
+                                    
+                                    {card.rarity && (
+                                      <Badge variant="outline" className="text-xs border-purple-300 text-purple-700 dark:border-purple-700 dark:text-purple-300">
+                                        {card.rarity}
+                                      </Badge>
+                                    )}
+                                    
+                                    <Badge variant="outline" className="text-xs border-blue-300 text-blue-700 dark:border-blue-700 dark:text-blue-300">
+                                      <Languages className="h-3 w-3 mr-1" />
+                                      {getLanguageLabel(card.language)}
+                                    </Badge>
+                                  </div>
                                 </div>
-                              </div>
-                              
-                              <div className="text-right">
-                                <div className="font-bold text-slate-800 dark:text-slate-100">
-                                  {new Intl.NumberFormat('fr-FR', {
-                                    style: 'currency',
-                                    currency: 'EUR'
-                                  }).format(card.price)}
+                                
+                                <div className="text-right">
+                                  <div className="font-bold text-slate-800 dark:text-slate-100">
+                                    {new Intl.NumberFormat('fr-FR', {
+                                      style: 'currency',
+                                      currency: 'EUR'
+                                    }).format(card.price)}
+                                  </div>
+                                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                                    Stock: {card.quantity}
+                                  </div>
+                                  <Button 
+                                    size="sm" 
+                                    className="mt-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+                                    onClick={() => handleAddToCart(card)}
+                                  >
+                                    Ajouter au panier
+                                  </Button>
                                 </div>
-                                <div className="text-sm text-slate-600 dark:text-slate-400">
-                                  Stock: {card.quantity}
-                                </div>
-                                <Button 
-                                  size="sm" 
-                                  className="mt-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
-                                  onClick={() => handleAddToCart(card)}
-                                >
-                                  Ajouter au panier
-                                </Button>
                               </div>
                             </div>
                           </div>
+                          {index < filteredInventory.length - 1 && <Separator className="dark:bg-slate-700" />}
                         </div>
-                        {index < filteredInventory.length - 1 && <Separator className="dark:bg-slate-700" />}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </main>
       
       <footer className="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 py-8 mt-16">
