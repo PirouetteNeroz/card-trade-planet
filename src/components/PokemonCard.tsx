@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Card as CardType } from "@/lib/api";
 import { Sparkles, Plus, Minus, Hash, Languages } from "lucide-react";
+import { getSeriesFrenchName } from "@/lib/api";
 
 interface PokemonCardProps extends CardType {
   addToCart: (card: CardType) => void;
@@ -31,6 +32,7 @@ export default function PokemonCard({
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [cartQuantity, setCartQuantity] = useState(1);
+  const [translatedExpansion, setTranslatedExpansion] = useState(expansion);
 
   const handleImageLoad = () => {
     setImageLoaded(true);
@@ -48,7 +50,7 @@ export default function PokemonCard({
       price,
       image_url,
       condition,
-      expansion,
+      expansion: translatedExpansion, // Utiliser le nom traduit
       expansion_id,
       rarity,
       blueprint_id,
@@ -58,6 +60,25 @@ export default function PokemonCard({
       isReverse
     });
   };
+
+  useEffect(() => {
+    // Essayer de traduire le nom de l'expansion si nécessaire
+    const translateExpansion = async () => {
+      if (expansion_id) {
+        try {
+          const frenchName = await getSeriesFrenchName(expansion_id);
+          if (frenchName && frenchName !== expansion) {
+            console.log(`Expansion traduite: ${expansion} -> ${frenchName}`);
+            setTranslatedExpansion(frenchName);
+          }
+        } catch (e) {
+          console.error("Erreur lors de la traduction de l'expansion:", e);
+        }
+      }
+    };
+    
+    translateExpansion();
+  }, [expansion_id, expansion]);
 
   const incrementQuantity = () => {
     if (cartQuantity < quantity) {
@@ -153,8 +174,8 @@ export default function PokemonCard({
             </p>
           )}
           <div className="flex justify-between items-center mt-2">
-            <div className="text-sm text-slate-500 dark:text-slate-400 font-medium">
-              {expansion}
+            <div className="text-sm text-slate-500 dark:text-slate-400 font-medium truncate max-w-[70%]">
+              {translatedExpansion}
             </div>
             <Badge variant="outline" className="text-xs whitespace-nowrap">
               {condition}

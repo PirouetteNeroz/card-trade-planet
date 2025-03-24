@@ -40,6 +40,7 @@ export async function findSeriesNameById(seriesId: string): Promise<string | und
   try {
     // Tenter de trouver le nom français
     const frenchName = await getSeriesFrenchName(englishName);
+    console.log(`Traduction pour ${seriesId}: ${englishName} -> ${frenchName}`);
     return frenchName || englishName;
   } catch (error) {
     console.error("Erreur lors de la traduction du nom de série:", error);

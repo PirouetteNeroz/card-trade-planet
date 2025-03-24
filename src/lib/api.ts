@@ -1,3 +1,4 @@
+
 // API configuration
 const API_PRODUCTS = 'https://api.cardtrader.com/api/v2/products/export';
 const API_EXPANSIONS = 'https://api.cardtrader.com/api/v2/expansions/export';
@@ -73,22 +74,17 @@ export async function fetchFrenchSeriesNames(): Promise<Record<string, string>> 
     
     // Créer un mapping entre noms anglais et français
     seriesData.forEach((series: any) => {
-      // Normaliser les noms pour la correspondance
-      const englishName = series.name.replace(/&/g, '').trim();
+      // Stocker l'ID avec le nom français
+      mapping[series.id.toLowerCase()] = series.name;
       
-      // Extraire l'identifiant du set basé sur le format (ex: sv01, swsh01)
-      const setId = series.id.toLowerCase();
-      
-      if (series.name && series.localName) {
-        mapping[englishName] = series.localName;
-        
-        // Aussi stocker par ID quand disponible
-        if (setId) {
-          mapping[setId] = series.localName;
-        }
+      // Aussi mapper le nom anglais vers le nom français si disponible
+      if (series.name) {
+        const simplifiedName = series.name.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        mapping[simplifiedName] = series.name;
       }
     });
     
+    console.log("Mapping des noms français chargé:", mapping);
     frenchSeriesNames = mapping;
     return mapping;
   } catch (error) {
@@ -99,24 +95,50 @@ export async function fetchFrenchSeriesNames(): Promise<Record<string, string>> 
 
 // Traduire un nom de série en français
 export async function getSeriesFrenchName(englishName: string): Promise<string> {
+  // Si l'entrée ressemble à un ID (format court comme sv01, swsh01)
+  if (/^[a-z0-9-]{2,8}$/i.test(englishName)) {
+    try {
+      // Essayer de récupérer directement depuis l'API
+      const response = await fetch(`https://api.tcgdex.net/v2/fr/sets/${englishName}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.name) {
+          console.log(`Traduction directe pour ${englishName}: ${data.name}`);
+          return data.name;
+        }
+      }
+    } catch (e) {
+      console.error("Erreur lors de la récupération directe:", e);
+    }
+  }
+  
+  // Fallback sur le mapping en cache
   const frenchNames = await fetchFrenchSeriesNames();
   
   // Nettoyer le nom pour la correspondance
-  const cleanName = englishName.replace(/&/g, '').trim();
+  const cleanName = englishName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
   
-  // Recherche directe
+  // Recherche directe par l'ID
+  if (frenchNames[englishName.toLowerCase()]) {
+    console.log(`Traduction par ID pour ${englishName}: ${frenchNames[englishName.toLowerCase()]}`);
+    return frenchNames[englishName.toLowerCase()];
+  }
+  
+  // Recherche par nom nettoyé
   if (frenchNames[cleanName]) {
+    console.log(`Traduction par nom nettoyé pour ${englishName}: ${frenchNames[cleanName]}`);
     return frenchNames[cleanName];
   }
   
-  // Recherche par correspondance partielle si la recherche directe échoue
+  // Recherche par correspondance partielle si les autres méthodes échouent
   for (const [key, value] of Object.entries(frenchNames)) {
-    if (cleanName.toLowerCase().includes(key.toLowerCase()) || 
-        key.toLowerCase().includes(cleanName.toLowerCase())) {
+    if (key.includes(cleanName) || cleanName.includes(key)) {
+      console.log(`Traduction par correspondance partielle pour ${englishName}: ${value}`);
       return value;
     }
   }
   
+  console.log(`Aucune traduction trouvée pour ${englishName}, retour du nom original`);
   return englishName; // Retourner le nom original si aucune traduction trouvée
 }
 
@@ -132,12 +154,20 @@ export async function fetchExpansions(): Promise<Record<string, string>> {
     
     const data = await response.json();
     const expansionMap: Record<string, string> = {};
-    const frenchNames = await fetchFrenchSeriesNames();
+    
+    // Précharger les noms français
+    await fetchFrenchSeriesNames();
     
     for (const exp of data) {
-      // Essayer de trouver la traduction française
-      const frenchName = await getSeriesFrenchName(exp.name);
-      expansionMap[exp.id] = frenchName || exp.name;
+      try {
+        // Essayer de trouver la traduction française
+        const frenchName = await getSeriesFrenchName(exp.id);
+        expansionMap[exp.id] = frenchName || exp.name;
+        console.log(`Expansion mappée: ${exp.id} -> ${expansionMap[exp.id]}`);
+      } catch (e) {
+        console.error(`Erreur lors de la traduction de ${exp.id}:`, e);
+        expansionMap[exp.id] = exp.name;
+      }
     }
     
     return expansionMap;

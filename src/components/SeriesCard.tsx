@@ -16,6 +16,7 @@ export default function SeriesCard({ serie, compact = false }: SeriesCardProps) 
   // Get the series ID for linking to inventory
   const seriesId = serie.tcgdex_id || findSeriesIdByName(serie.name);
   const [cardCount, setCardCount] = useState<number | undefined>(undefined);
+  const [seriesName, setSeriesName] = useState<string>(serie.name);
   
   useEffect(() => {
     const fetchSeriesInfo = async () => {
@@ -23,6 +24,20 @@ export default function SeriesCard({ serie, compact = false }: SeriesCardProps) 
         const info = await getSeriesInfo(seriesId);
         if (info.cardCount) {
           setCardCount(info.cardCount);
+        }
+        
+        // Essayons de récupérer le nom français de la série depuis l'API TCGdex
+        try {
+          const response = await fetch(`https://api.tcgdex.net/v2/fr/sets/${seriesId}`);
+          if (response.ok) {
+            const data = await response.json();
+            // Utiliser le nom local (français) ou garder le nom original
+            if (data.name) {
+              setSeriesName(data.name);
+            }
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération du nom français:", error);
         }
       }
     };
@@ -38,12 +53,12 @@ export default function SeriesCard({ serie, compact = false }: SeriesCardProps) 
             {serie.logo_url ? (
               <img
                 src={serie.logo_url}
-                alt={serie.name}
+                alt={seriesName}
                 className="max-h-full max-w-full object-contain"
               />
             ) : (
               <div className="text-2xl font-bold text-center text-slate-500 dark:text-slate-400">
-                {serie.name}
+                {seriesName}
               </div>
             )}
           </div>
@@ -51,7 +66,7 @@ export default function SeriesCard({ serie, compact = false }: SeriesCardProps) 
 
         <CardContent className={compact ? "p-3" : "p-4"}>
           <h3 className={`font-bold ${compact ? "text-sm" : "text-lg"} mb-1`}>
-            {serie.name}
+            {seriesName}
           </h3>
           
           {!compact && (
