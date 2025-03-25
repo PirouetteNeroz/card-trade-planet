@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import CartItem from "@/components/CartItem";
-import { CartItem as CartItemType, loadCartFromLocalStorage, saveCartToLocalStorage, createOrder } from "@/lib/api";
+import { CartItem as CartItemType, loadCartFromLocalStorage, saveCartToLocalStorage } from "@/lib/api";
+import { createSupabaseOrder } from "@/lib/supabase-utils";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,9 +71,9 @@ export default function Cart() {
     setIsProcessing(true);
     
     try {
-      // Create the order
+      // Create the order using Supabase
       const subtotal = calculateSubtotal();
-      const orderId = await createOrder(username, cart, subtotal);
+      const order = await createSupabaseOrder(username, cart, subtotal);
       
       // Clear the cart
       setCart([]);
@@ -80,7 +81,7 @@ export default function Cart() {
       
       toast({
         title: "Commande envoyée avec succès !",
-        description: `Votre commande #${orderId} a été reçue.`,
+        description: `Votre commande #${order.order_id} a été reçue.`,
         duration: 5000,
       });
       

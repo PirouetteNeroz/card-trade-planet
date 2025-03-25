@@ -46,12 +46,15 @@ export async function saveCart(name: string, items: CartItem[], totalPrice: numb
     throw new Error('User not authenticated');
   }
   
+  // Convert cart items to a format compatible with jsonb
+  const jsonItems = JSON.parse(JSON.stringify(items));
+  
   const { data, error } = await supabase
     .from('saved_carts')
     .insert({
       user_id: user.id,
       name,
-      items,
+      items: jsonItems,
       total_price: totalPrice
     })
     .select()
@@ -86,13 +89,16 @@ export async function createSupabaseOrder(username: string, items: CartItem[], t
   // Generate a unique order ID
   const orderId = `ORD-${Date.now().toString().slice(-8)}-${Math.floor(Math.random() * 1000)}`;
   
+  // Convert cart items to a format compatible with jsonb
+  const jsonItems = JSON.parse(JSON.stringify(items));
+  
   const { data, error } = await supabase
     .from('orders')
     .insert({
       order_id: orderId,
       user_id: user?.id || null,
       username,
-      items,
+      items: jsonItems,
       total_price: totalPrice
     })
     .select()
