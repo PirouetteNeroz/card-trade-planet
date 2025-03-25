@@ -71,9 +71,13 @@ export default function Cart() {
     setIsProcessing(true);
     
     try {
+      console.log("Submitting order with:", { username, cart, totalPrice: calculateSubtotal() });
+      
       // Create the order using Supabase
       const subtotal = calculateSubtotal();
       const order = await createSupabaseOrder(username, cart, subtotal);
+      
+      console.log("Order response:", order);
       
       // Clear the cart
       setCart([]);

@@ -92,6 +92,14 @@ export async function createSupabaseOrder(username: string, items: CartItem[], t
   // Convert cart items to a format compatible with jsonb
   const jsonItems = JSON.parse(JSON.stringify(items));
   
+  console.log('Creating order with data:', {
+    order_id: orderId,
+    user_id: user?.id || null,
+    username,
+    items: jsonItems,
+    total_price: totalPrice
+  });
+
   const { data, error } = await supabase
     .from('orders')
     .insert({
@@ -99,7 +107,8 @@ export async function createSupabaseOrder(username: string, items: CartItem[], t
       user_id: user?.id || null,
       username,
       items: jsonItems,
-      total_price: totalPrice
+      total_price: totalPrice,
+      status: 'pending'
     })
     .select()
     .single();
@@ -109,6 +118,7 @@ export async function createSupabaseOrder(username: string, items: CartItem[], t
     throw error;
   }
   
+  console.log('Order created successfully:', data);
   return data as Order;
 }
 
